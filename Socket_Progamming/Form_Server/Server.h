@@ -9,14 +9,10 @@
 //#include <stdexcept>
 //#include <sstream>
 //#include <iomanip>
+#include "..\Struct\Header.h"
 #include "MainForm.h"
 
 
-using namespace System;
-using namespace System::Net;
-using namespace System::Net::Sockets;
-using namespace System::Collections::Generic; //List
-using namespace System::Threading; //Thread
 
 
 #pragma comment (lib, "Ws2_32.lib")
@@ -31,44 +27,16 @@ using namespace System::Threading; //Thread
 const char OPTION_VALUE = 1;
 
 
-
-ref class Account {
-private:
-	System::String^ userName, ^passWord;
-public:
-public:
-	Account() {
-		userName = passWord = "";
-		
-	}
-	void setUserName(String^ user) { userName = user; }
-	void setPassWord(String^ pw) { passWord = pw; }
-	String^ getUserName() { return userName; }
-	String^ getPassWord() { return passWord; }
-	void changePassWord(String^ npw) {
-		this->setPassWord(npw);
-	}
-	void registerAccount(String^ user, String^ pw) {
-		this->setPassWord(pw);
-		this->setUserName(user);
-	}
-	~Account() {
-
-	}
-};
-
-
-ref class Client {
-public:
-	Socket^ clientSocket = nullptr;
-	Account^ account = nullptr;
-	int id;
-	String^ userName;
-	Client() {
-		id = -1;
-		userName = account->getUserName();
-	}
-};
+//ref class Client {
+//public:
+//	Socket^ clientSocket = nullptr;
+//	String^ userName = nullptr;
+//	Client() {};
+//	Client(Socket^ socket, String^ user) {
+//		clientSocket = socket;
+//		userName = user;
+//	}
+//};
 
 
 ref class Server {
@@ -82,11 +50,14 @@ private:
 public:
 
 	List<Client^>^ clients = gcnew List<Client^>();
+	String^ test;
 	Socket^ serverSocket = nullptr;
 	int numberOfClients;
 	String^ serverIpAddress;
 	int serverPortAddress;
-	List<Thread^>^ threads = gcnew List<Thread^>();
+
+
+	String^ accountPath = "Account/accounts.txt";
 
 	// Form
 	Form_Server::MainForm^ mainScreen;
@@ -128,35 +99,198 @@ public:
 		return 0;
 	}
 
-	//static bool processClient(Client^ newClient) {
-	//	String^ messenger = "";
-	//	//char* tempMessenger = new char[DEFAULT_BUFFER_LENGTH];
-	//	array<Byte>^ buff = gcnew array<Byte>(DEFAULT_BUFFER_LENGTH);
-	//	if (newClient->clientSocket == nullptr)
-	//		return false;
-
-	//	while (1) {
-	//		//(tempMessenger, 0, DEFAULT_BUFFER_LENGTH);
-	//		//int checkResult = System::Net::Sockets::SocketReceiveFromResult(newClient->clientSocket, tempMessenger, DEFAULT_BUFFER_LENGTH, 0);
-	//		int iResult = newClient->clientSocket->Receive(buff);
-
-
-
-	//	}
-	//	return true;
-	//}
 
 
 	// Login
-	bool checkInputLogin(String^ user, String^ password, String^& errorMessenger) {
+	bool checkLogin(String^ user, String^ password, String^& errorMessage) {
 		if (String::IsNullOrEmpty(user) || String::IsNullOrEmpty(password)) {
-			errorMessenger = "User Name or Password can't be blank !";
+			errorMessage = "User Name or Password can't be blank !";
 			return false;
 		}
 
+		if(user->Contains("_") || password->Contains("_"))
+		{
+			errorMessage = "Username or password can't contain special characters!";
+			return false;
+		}
+		if (!checkAccountLogin(user, password)) {
+			errorMessage = "Username or password is not correct!";
+			return false;
+		}
+
+		for each (String ^ userName in this->getListOfClient()) {
+			if (user == userName) {
+				errorMessage = user + " is current login on another client!";
+				return false;
+			}
+		}
+
+		return true;
 
 		return true;
 	}
+
+	bool checkSignUp(String^ user, String^ password, String^& errorMessage) {
+		if (String::IsNullOrEmpty(user) || String::IsNullOrEmpty(password)) {
+			errorMessage = "User Name or Password can't be blank !";
+			return false;
+		}
+		if (user->Contains("_") || password->Contains("_"))
+		{
+			errorMessage = "Username or password can't contain special characters!";
+			return false;
+		}
+		if (isAccountExists(user)) {
+			errorMessage = "Account has been registered!";
+			return false;
+		}
+
+		if (!addAccount(user, password)) {
+			errorMessage = "Can't register!";
+			return false;
+		}
+
+		return true;
+	}
+
+
+	
+	bool checkAccountLogin(String^ user, String^ pw) {
+		array<String^>^ lines = System::IO::File::ReadAllLines(this->accountPath);
+		for each (String ^ line in lines) {
+			if (line == user + "_" + pw)
+				return true;
+		}
+
+		return false;
+	}
+
+	bool isAccountExists(String^ user) {
+		array<String^>^ lines = System::IO::File::ReadAllLines(this->accountPath);
+		for each (String ^ line in lines) {
+			if (line->Contains(user))
+				return true;
+		}
+
+		return false;
+	}
+
+
+	bool addAccount(String^ user, String^ pw) {
+		try {
+			System::IO::File::AppendText(user + "_" + pw + "\n");
+		}
+		catch (Exception^ e) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+
+	//  Main login 
+	bool logIn(String^ userName, String^ pw, Socket^ clientSocket) {
+		String^ errorMessenger = "";
+		if (checkLogin(userName, pw, errorMessenger)) {
+			clients->Add(gcnew Client(clientSocket, userName));
+			this->mainScreen->updateConnectedClient(this->getListOfClient());
+			this->mainScreen->appendTextToBoxChat(userName + "has just onlline !");
+
+			logInResponse(true, errorMessenger, clientSocket);
+			sendLogInNotification(userName, clientSocket);
+
+			return true;
+		}
+
+		logInResponse(false, errorMessenger, clientSocket);
+
+		return false;
+	}
+
+	void logInResponse(bool isSuccessful, String^ errorMessage, Socket^ clientSocket) {
+		ResponseLogIn^ result = gcnew ResponseLogIn();
+		result->isSuccessful = isSuccessful;
+		result->errorMessage = errorMessage;
+		array<Byte>^ buffer = result->pack();
+
+		clientSocket->Send(buffer);
+	}
+
+	void sendLogInNotification(String^ userName, Socket^ clientSocket) {
+		LogInNotification^ lgNoti = gcnew LogInNotification;
+		lgNoti->userName = userName;
+		array<Byte>^ buffer = lgNoti->pack();
+
+
+		for each (Client ^ client in clients) {
+			if (client->clientSocket != clientSocket)
+				client->clientSocket->Send(buffer);
+		}
+	}
+
+
+
+	bool signUp(String^ userName, String^ pw, Socket^ clientSocket) {
+		String^ errorMessenger = "";
+		if (checkSignUp(userName, pw, errorMessenger)) {
+			
+			signUp(userName, pw, clientSocket);
+			signUpResponse(true, errorMessenger, clientSocket);
+
+			return true;
+		}
+
+		signUpResponse(false, errorMessenger, clientSocket);
+
+		return false;
+	}
+
+
+	void signUpResponse(bool isSuccessful, String^ errorMessage, Socket^ clientSocket) {
+		ResponseSignUp^ result = gcnew ResponseSignUp();
+		result->isSuccessful = isSuccessful;
+		result->errorMessage = errorMessage;
+		array<Byte>^ buffer = result->pack();
+
+		clientSocket->Send(buffer);
+	}
+
+
+
+
+
+
+
+	// others
+
+	List<String^>^ getListOfClient() {
+		List<String^>^ list = gcnew List<String^>();
+
+
+		for each (Client ^ client in clients) {
+			list->Add(client->userName);
+		}
+
+
+		return list;
+	}
+
+	Socket^ getSocketByUserName(String^ userName) {
+		for each (Client ^ client in clients) {
+			if (client->userName == userName)
+				return client->clientSocket;
+		}
+
+		return nullptr;
+	}
+	void removeClientByUserName(String^ userName) {
+		for each (Client ^ client in clients) {
+			if (client->userName == userName)
+				clients->Remove(client);
+		}
+	}
+
 
 
 };

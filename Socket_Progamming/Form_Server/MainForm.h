@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include"..\Struct\Struct.h"
+
 
 namespace Form_Server {
 
@@ -44,14 +46,16 @@ namespace Form_Server {
 	private: System::Windows::Forms::Label^ label_Top3;
 	private: System::Windows::Forms::TextBox^ textBox_IP;
 	private: System::Windows::Forms::TextBox^ textBox_Port;
-	private: System::Windows::Forms::ListBox^ listBox_Clients;
+
 	private: System::Windows::Forms::Label^ label_listOfClients;
 	private: System::Windows::Forms::Button^ button_RunServer;
 	private: System::ComponentModel::BackgroundWorker^ backgroundWorker1;
 
 
-	public:  
-		Thread^ threadListenClient;
+
+	private: System::Windows::Forms::TextBox^ textBox_listClients;
+	private: System::Windows::Forms::TextBox^ textBox_boxChat;
+	private: System::Windows::Forms::Label^ label_BoxChat;
 
 
 
@@ -73,10 +77,12 @@ namespace Form_Server {
 			this->label_Top3 = (gcnew System::Windows::Forms::Label());
 			this->textBox_IP = (gcnew System::Windows::Forms::TextBox());
 			this->textBox_Port = (gcnew System::Windows::Forms::TextBox());
-			this->listBox_Clients = (gcnew System::Windows::Forms::ListBox());
 			this->label_listOfClients = (gcnew System::Windows::Forms::Label());
 			this->button_RunServer = (gcnew System::Windows::Forms::Button());
 			this->backgroundWorker1 = (gcnew System::ComponentModel::BackgroundWorker());
+			this->textBox_listClients = (gcnew System::Windows::Forms::TextBox());
+			this->textBox_boxChat = (gcnew System::Windows::Forms::TextBox());
+			this->label_BoxChat = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// label_Top2
@@ -104,7 +110,6 @@ namespace Form_Server {
 			this->textBox_IP->ReadOnly = true;
 			this->textBox_IP->Size = System::Drawing::Size(100, 22);
 			this->textBox_IP->TabIndex = 4;
-			this->textBox_IP->Text = L"192.168.0.1";
 			this->textBox_IP->TextChanged += gcnew System::EventHandler(this, &MainForm::textBox_IP_TextChanged);
 			// 
 			// textBox_Port
@@ -114,17 +119,7 @@ namespace Form_Server {
 			this->textBox_Port->ReadOnly = true;
 			this->textBox_Port->Size = System::Drawing::Size(100, 22);
 			this->textBox_Port->TabIndex = 5;
-			this->textBox_Port->Text = L"3504";
 			this->textBox_Port->TextChanged += gcnew System::EventHandler(this, &MainForm::textBox_Port_TextChanged);
-			// 
-			// listBox_Clients
-			// 
-			this->listBox_Clients->FormattingEnabled = true;
-			this->listBox_Clients->ItemHeight = 16;
-			this->listBox_Clients->Location = System::Drawing::Point(43, 112);
-			this->listBox_Clients->Name = L"listBox_Clients";
-			this->listBox_Clients->Size = System::Drawing::Size(204, 244);
-			this->listBox_Clients->TabIndex = 6;
 			// 
 			// label_listOfClients
 			// 
@@ -137,7 +132,7 @@ namespace Form_Server {
 			// 
 			// button_RunServer
 			// 
-			this->button_RunServer->Location = System::Drawing::Point(281, 21);
+			this->button_RunServer->Location = System::Drawing::Point(320, 22);
 			this->button_RunServer->Name = L"button_RunServer";
 			this->button_RunServer->Size = System::Drawing::Size(118, 36);
 			this->button_RunServer->TabIndex = 8;
@@ -149,14 +144,43 @@ namespace Form_Server {
 			// 
 			this->backgroundWorker1->DoWork += gcnew System::ComponentModel::DoWorkEventHandler(this, &MainForm::backgroundWorker1_DoWork);
 			// 
+			// textBox_listClients
+			// 
+			this->textBox_listClients->Location = System::Drawing::Point(46, 110);
+			this->textBox_listClients->Multiline = true;
+			this->textBox_listClients->Name = L"textBox_listClients";
+			this->textBox_listClients->ReadOnly = true;
+			this->textBox_listClients->Size = System::Drawing::Size(198, 228);
+			this->textBox_listClients->TabIndex = 9;
+			// 
+			// textBox_boxChat
+			// 
+			this->textBox_boxChat->Location = System::Drawing::Point(275, 110);
+			this->textBox_boxChat->Multiline = true;
+			this->textBox_boxChat->Name = L"textBox_boxChat";
+			this->textBox_boxChat->ReadOnly = true;
+			this->textBox_boxChat->Size = System::Drawing::Size(198, 228);
+			this->textBox_boxChat->TabIndex = 10;
+			// 
+			// label_BoxChat
+			// 
+			this->label_BoxChat->AutoSize = true;
+			this->label_BoxChat->Location = System::Drawing::Point(272, 90);
+			this->label_BoxChat->Name = L"label_BoxChat";
+			this->label_BoxChat->Size = System::Drawing::Size(64, 17);
+			this->label_BoxChat->TabIndex = 11;
+			this->label_BoxChat->Text = L"Box Chat";
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(478, 368);
+			this->ClientSize = System::Drawing::Size(515, 368);
+			this->Controls->Add(this->label_BoxChat);
+			this->Controls->Add(this->textBox_boxChat);
+			this->Controls->Add(this->textBox_listClients);
 			this->Controls->Add(this->button_RunServer);
 			this->Controls->Add(this->label_listOfClients);
-			this->Controls->Add(this->listBox_Clients);
 			this->Controls->Add(this->textBox_Port);
 			this->Controls->Add(this->textBox_IP);
 			this->Controls->Add(this->label_Top3);
@@ -174,6 +198,11 @@ namespace Form_Server {
 	private: System::Void textBox_Port_TextChanged(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void button_RunServer_Click(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void backgroundWorker1_DoWork(System::Object^ sender, System::ComponentModel::DoWorkEventArgs^ e);
+	public: static void listenMessenger(Object^ obj);
+
+	public: Thread^ threadListenClient;
+	public: void updateConnectedClient(List<String^>^ clients);
+	public: void appendTextToBoxChat(String^ text);
 };
 
 }

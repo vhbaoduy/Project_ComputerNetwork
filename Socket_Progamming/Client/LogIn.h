@@ -136,9 +136,16 @@ namespace Client {
 #pragma endregion
 	private: System::Void button_LogIn_Click(System::Object^ sender, System::EventArgs^ e) {
 		AppSocket test;
+		array<unsigned char>^ tesst = gcnew array<unsigned char>(10);
+		for (int i = 0; i < 10; i++)
+			tesst[i] = 'a';
+
 		test.initializeSocket();
-		if (!test.connectToServer())
+		if (!test.connectToServer()) {
 			MessageBox::Show("Connect successfuly", "Notification", MessageBoxButtons::OKCancel);
+			test.clientSocket->Send(tesst, tesst->Length, SocketFlags::None);
+		}
+
 	}
 };
 }
