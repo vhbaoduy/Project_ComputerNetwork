@@ -1,7 +1,6 @@
 #pragma once
-#include "AppSocket.h"
 
-namespace Client {
+namespace Form_Client {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -47,7 +46,7 @@ namespace Client {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container ^components;
+		System::ComponentModel::Container^ components;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -96,6 +95,7 @@ namespace Client {
 			this->textBox_Password->Size = System::Drawing::Size(167, 22);
 			this->textBox_Password->TabIndex = 3;
 			this->textBox_Password->UseSystemPasswordChar = true;
+			this->textBox_Password->TextChanged += gcnew System::EventHandler(this, &LogIn::textBox_Password_TextChanged);
 			// 
 			// button_SignUp
 			// 
@@ -105,6 +105,7 @@ namespace Client {
 			this->button_SignUp->TabIndex = 4;
 			this->button_SignUp->Text = L"Sign Up";
 			this->button_SignUp->UseVisualStyleBackColor = true;
+			this->button_SignUp->Click += gcnew System::EventHandler(this, &LogIn::button_SignUp_Click);
 			// 
 			// button_LogIn
 			// 
@@ -129,23 +130,16 @@ namespace Client {
 			this->Controls->Add(this->label_userName);
 			this->Name = L"LogIn";
 			this->Text = L"Client";
+			this->Load += gcnew System::EventHandler(this, &LogIn::LogIn_Load);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
-	private: System::Void button_LogIn_Click(System::Object^ sender, System::EventArgs^ e) {
-		AppSocket test;
-		array<unsigned char>^ tesst = gcnew array<unsigned char>(10);
-		for (int i = 0; i < 10; i++)
-			tesst[i] = 'a';
-
-		test.initializeSocket();
-		if (!test.connectToServer()) {
-			MessageBox::Show("Connect successfuly", "Notification", MessageBoxButtons::OKCancel);
-			test.clientSocket->Send(tesst, tesst->Length, SocketFlags::None);
-		}
-
-	}
+	private: System::Void button_LogIn_Click(System::Object^ sender, System::EventArgs^ e);
+	private: System::Void button_SignUp_Click(System::Object^ sender, System::EventArgs^ e);
+	private: System::Void LogIn_Load(System::Object^ sender, System::EventArgs^ e);
+private: System::Void textBox_Password_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+}
 };
 }

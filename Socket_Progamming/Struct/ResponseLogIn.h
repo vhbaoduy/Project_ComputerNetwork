@@ -11,7 +11,12 @@ public:
 		errorMessage = nullptr;
 	}
 
-	array<Byte>^ pack()override {
+	ResponseLogIn(bool isSucc, String^ errMsg) {
+		isSuccessful = isSucc;
+		errorMessage = errMsg;
+	}
+
+	virtual array<Byte>^ pack()override {
 		List<Byte>^ byteData = gcnew List<Byte>();
 		byteData->AddRange(BitConverter::GetBytes(int(StructClass::MessageType::ResponseLogin)));
 		byteData->AddRange(BitConverter::GetBytes(isSuccessful));
@@ -26,11 +31,11 @@ public:
 		return byteData->ToArray();
 	}
 
-	StructClass^ unpack(array<Byte>^ buffer) override {
+	virtual StructClass^ unpack(array<Byte>^ buffer) override {
 		int offset = 4;
 		isSuccessful = BitConverter::ToBoolean(buffer, offset);
 
-		offset += 4;
+		offset += 1;
 		int errorMessageLength = BitConverter::ToInt32(buffer, offset);
 
 		offset += 4;

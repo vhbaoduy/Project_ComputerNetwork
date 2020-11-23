@@ -105,6 +105,7 @@ namespace Form_Server {
 			// 
 			// textBox_IP
 			// 
+			this->textBox_IP->Enabled = false;
 			this->textBox_IP->Location = System::Drawing::Point(144, 12);
 			this->textBox_IP->Name = L"textBox_IP";
 			this->textBox_IP->ReadOnly = true;
@@ -114,6 +115,7 @@ namespace Form_Server {
 			// 
 			// textBox_Port
 			// 
+			this->textBox_Port->Enabled = false;
 			this->textBox_Port->Location = System::Drawing::Point(144, 43);
 			this->textBox_Port->Name = L"textBox_Port";
 			this->textBox_Port->ReadOnly = true;
@@ -124,11 +126,11 @@ namespace Form_Server {
 			// label_listOfClients
 			// 
 			this->label_listOfClients->AutoSize = true;
-			this->label_listOfClients->Location = System::Drawing::Point(43, 89);
+			this->label_listOfClients->Location = System::Drawing::Point(9, 89);
 			this->label_listOfClients->Name = L"label_listOfClients";
-			this->label_listOfClients->Size = System::Drawing::Size(92, 17);
+			this->label_listOfClients->Size = System::Drawing::Size(76, 17);
 			this->label_listOfClients->TabIndex = 7;
-			this->label_listOfClients->Text = L"List of Clients";
+			this->label_listOfClients->Text = L"Connected";
 			// 
 			// button_RunServer
 			// 
@@ -146,26 +148,28 @@ namespace Form_Server {
 			// 
 			// textBox_listClients
 			// 
-			this->textBox_listClients->Location = System::Drawing::Point(46, 110);
+			this->textBox_listClients->Location = System::Drawing::Point(12, 110);
 			this->textBox_listClients->Multiline = true;
 			this->textBox_listClients->Name = L"textBox_listClients";
 			this->textBox_listClients->ReadOnly = true;
-			this->textBox_listClients->Size = System::Drawing::Size(198, 228);
+			this->textBox_listClients->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
+			this->textBox_listClients->Size = System::Drawing::Size(198, 115);
 			this->textBox_listClients->TabIndex = 9;
 			// 
 			// textBox_boxChat
 			// 
-			this->textBox_boxChat->Location = System::Drawing::Point(275, 110);
+			this->textBox_boxChat->Location = System::Drawing::Point(240, 110);
 			this->textBox_boxChat->Multiline = true;
 			this->textBox_boxChat->Name = L"textBox_boxChat";
 			this->textBox_boxChat->ReadOnly = true;
-			this->textBox_boxChat->Size = System::Drawing::Size(198, 228);
+			this->textBox_boxChat->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
+			this->textBox_boxChat->Size = System::Drawing::Size(263, 228);
 			this->textBox_boxChat->TabIndex = 10;
 			// 
 			// label_BoxChat
 			// 
 			this->label_BoxChat->AutoSize = true;
-			this->label_BoxChat->Location = System::Drawing::Point(272, 90);
+			this->label_BoxChat->Location = System::Drawing::Point(237, 90);
 			this->label_BoxChat->Name = L"label_BoxChat";
 			this->label_BoxChat->Size = System::Drawing::Size(64, 17);
 			this->label_BoxChat->TabIndex = 11;
@@ -198,11 +202,12 @@ namespace Form_Server {
 	private: System::Void textBox_Port_TextChanged(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void button_RunServer_Click(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void backgroundWorker1_DoWork(System::Object^ sender, System::ComponentModel::DoWorkEventArgs^ e);
-	public: static void listenMessenger(Object^ obj);
+	public: static void listenMessage(Object^ obj);
 
 	public: Thread^ threadListenClient;
 	public: void updateConnectedClient(List<String^>^ clients);
 	public: void appendTextToBoxChat(String^ text);
+
 };
 
 }

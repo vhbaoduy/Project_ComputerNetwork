@@ -18,11 +18,13 @@ public:
 	AppSocket() {
 		serverIpAddress = "127.128.0.1";
 		serverPortAddress = 2020;
+		this->initializeSocket();
 	}
 
 	AppSocket(String^ ip, int port) {
 		serverIpAddress = ip;
 		serverPortAddress = port;
+		this->initializeSocket();
 	}
 
 	int createSocket() {
@@ -55,6 +57,21 @@ public:
 				MessageBoxButtons::OK, MessageBoxIcon::Error);
 			return 1; //Error
 		}
+
+		return 0;
+	}
+
+	int sendMessage(array<Byte>^ buffer) {
+		if (this->clientSocket != nullptr)
+			return clientSocket->Send(buffer, buffer->Length, SocketFlags::None);
+
+
+		return 0;
+	}
+	int sendMessage(array<Byte>^ buffer, int size) {
+		if (this->clientSocket != nullptr)
+			return clientSocket->Send(buffer, size, SocketFlags::None);
+
 
 		return 0;
 	}

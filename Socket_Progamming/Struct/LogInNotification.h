@@ -9,7 +9,7 @@ public:
 		userName = nullptr;
 	}
 
-	array<Byte>^ pack() override {
+	virtual array<Byte>^ pack() override {
 		List<Byte>^ byteData = gcnew List<Byte>();
 		byteData->AddRange(BitConverter::GetBytes(int(StructClass::MessageType::LogInNotification)));
 
@@ -23,7 +23,7 @@ public:
 		return byteData->ToArray();
 	}
 
-	StructClass^ unpack(array<Byte>^ buffer) override {
+	virtual StructClass^ unpack(array<Byte>^ buffer) override {
 		int offset = 4;
 
 		int userNameLength = BitConverter::ToInt32(buffer, offset);

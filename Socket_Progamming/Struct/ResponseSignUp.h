@@ -10,10 +10,14 @@ public:
 		isSuccessful = false;
 		errorMessage = nullptr;
 	}
+	ResponseSignUp(bool isSucc, String^ errMsg) {
+		isSuccessful = isSucc;
+		errorMessage = errMsg;
+	}
 
-	array<Byte>^ pack()override {
+	virtual array<Byte>^ pack()override {
 		List<Byte>^ byteData = gcnew List<Byte>();
-		byteData->AddRange(BitConverter::GetBytes(int(StructClass::MessageType::ResponseLogin)));
+		byteData->AddRange(BitConverter::GetBytes(int(StructClass::MessageType::ResponseSignUp)));
 		byteData->AddRange(BitConverter::GetBytes(isSuccessful));
 
 		if (errorMessage != nullptr) {
@@ -26,11 +30,11 @@ public:
 		return byteData->ToArray();
 	}
 
-	StructClass^ unpack(array<Byte>^ buffer) override {
+	virtual StructClass^ unpack(array<Byte>^ buffer) override {
 		int offset = 4;
 		isSuccessful = BitConverter::ToBoolean(buffer, offset);
 
-		offset += 4;
+		offset += 1;
 		int errorMessageLength = BitConverter::ToInt32(buffer, offset);
 
 		offset += 4;

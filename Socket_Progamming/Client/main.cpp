@@ -8,14 +8,18 @@ using namespace System;
 //}
 
 
-#include "LogIn.h"
-
 using namespace System::Windows::Forms; 
+
+#include "ConnectServer.h"
+#include "CentralController.h"
+using namespace Form_Client;
 
 [STAThread]
 int main() {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
-	Application::Run(gcnew Client::LogIn);
+
+	CentralController::getObject()->connectScreen = gcnew Form_Client::ConnectServer;
+	Application::Run(CentralController::getObject()->connectScreen);
 	return 0;
 }

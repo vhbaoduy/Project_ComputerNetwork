@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Account.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Struct.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -31,6 +28,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="LogInNotification.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="LogInClass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SignUpClass.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

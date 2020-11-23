@@ -57,7 +57,7 @@ public:
 	int serverPortAddress;
 
 
-	String^ accountPath = "Account/accounts.txt";
+	String^ accountPath = "Account\\accounts.txt";
 
 	// Form
 	Form_Server::MainForm^ mainScreen;
@@ -108,7 +108,7 @@ public:
 			return false;
 		}
 
-		if(user->Contains("_") || password->Contains("_"))
+		if(user->Contains(",") || password->Contains(","))
 		{
 			errorMessage = "Username or password can't contain special characters!";
 			return false;
@@ -127,7 +127,7 @@ public:
 
 		return true;
 
-		return true;
+	
 	}
 
 	bool checkSignUp(String^ user, String^ password, String^& errorMessage) {
@@ -135,7 +135,7 @@ public:
 			errorMessage = "User Name or Password can't be blank !";
 			return false;
 		}
-		if (user->Contains("_") || password->Contains("_"))
+		if (user->Contains(",") || password->Contains(","))
 		{
 			errorMessage = "Username or password can't contain special characters!";
 			return false;
@@ -157,8 +157,9 @@ public:
 	
 	bool checkAccountLogin(String^ user, String^ pw) {
 		array<String^>^ lines = System::IO::File::ReadAllLines(this->accountPath);
-		for each (String ^ line in lines) {
-			if (line == user + "_" + pw)
+		
+		for each (String^ line in lines) {
+			if (line == user + "," + pw )
 				return true;
 		}
 
@@ -168,7 +169,7 @@ public:
 	bool isAccountExists(String^ user) {
 		array<String^>^ lines = System::IO::File::ReadAllLines(this->accountPath);
 		for each (String ^ line in lines) {
-			if (line->Contains(user))
+			if (line->Contains(user+ ","))
 				return true;
 		}
 
@@ -178,7 +179,7 @@ public:
 
 	bool addAccount(String^ user, String^ pw) {
 		try {
-			System::IO::File::AppendText(user + "_" + pw + "\n");
+			System::IO::File::AppendAllText(this->accountPath,user + "," + pw + "\n");
 		}
 		catch (Exception^ e) {
 			return false;
@@ -191,27 +192,29 @@ public:
 
 	//  Main login 
 	bool logIn(String^ userName, String^ pw, Socket^ clientSocket) {
-		String^ errorMessenger = "";
-		if (checkLogin(userName, pw, errorMessenger)) {
+		String^ errorMessage = "";
+		if (checkLogin(userName, pw, errorMessage)) {
 			clients->Add(gcnew Client(clientSocket, userName));
 			this->mainScreen->updateConnectedClient(this->getListOfClient());
-			this->mainScreen->appendTextToBoxChat(userName + "has just onlline !");
+			this->mainScreen->appendTextToBoxChat(userName + " has just onlline !");
 
-			logInResponse(true, errorMessenger, clientSocket);
-			sendLogInNotification(userName, clientSocket);
+			logInResponse(true, errorMessage, clientSocket);
+			//this->mainScreen->updateConnectedClient(this->getListOfClient());
+
+			//sendLogInNotification(userName, clientSocket);
 
 			return true;
 		}
 
-		logInResponse(false, errorMessenger, clientSocket);
+		logInResponse(false, errorMessage, clientSocket);
 
 		return false;
 	}
 
 	void logInResponse(bool isSuccessful, String^ errorMessage, Socket^ clientSocket) {
-		ResponseLogIn^ result = gcnew ResponseLogIn();
-		result->isSuccessful = isSuccessful;
-		result->errorMessage = errorMessage;
+		ResponseLogIn^ result = gcnew ResponseLogIn(isSuccessful,errorMessage);
+		//result->isSuccessful = isSuccessful;
+		//result->errorMessage = errorMessage;
 		array<Byte>^ buffer = result->pack();
 
 		clientSocket->Send(buffer);
@@ -232,25 +235,24 @@ public:
 
 
 	bool signUp(String^ userName, String^ pw, Socket^ clientSocket) {
-		String^ errorMessenger = "";
-		if (checkSignUp(userName, pw, errorMessenger)) {
+		String^ errorMessage = "";
+		if (checkSignUp(userName, pw, errorMessage)) {
 			
-			signUp(userName, pw, clientSocket);
-			signUpResponse(true, errorMessenger, clientSocket);
+			signUpResponse(true, errorMessage, clientSocket);
 
 			return true;
 		}
 
-		signUpResponse(false, errorMessenger, clientSocket);
+		signUpResponse(false, errorMessage, clientSocket);
 
 		return false;
 	}
 
 
 	void signUpResponse(bool isSuccessful, String^ errorMessage, Socket^ clientSocket) {
-		ResponseSignUp^ result = gcnew ResponseSignUp();
-		result->isSuccessful = isSuccessful;
-		result->errorMessage = errorMessage;
+		ResponseSignUp^ result = gcnew ResponseSignUp(isSuccessful,errorMessage);
+		//result->isSuccessful = isSuccessful;
+		//result->errorMessage = errorMessage;
 		array<Byte>^ buffer = result->pack();
 
 		clientSocket->Send(buffer);

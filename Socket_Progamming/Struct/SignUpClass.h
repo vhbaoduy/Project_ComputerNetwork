@@ -1,19 +1,19 @@
 #pragma once
 #include "Struct.h"
-ref class Account : public StructClass
+ref class SignUpClass:public StructClass
 {
 public:
 	String^ userName;
 	String^ passWord;
 
-	Account() {
+	SignUpClass() {
 		userName = nullptr;
 		passWord = nullptr;
 	}
 
-	array<Byte>^ pack() override {
+	virtual array<Byte>^ pack() override {
 		List<Byte>^ byteData = gcnew List<Byte>();
-		byteData->AddRange(BitConverter::GetBytes(int(StructClass::MessageType::LogIn)));
+		byteData->AddRange(BitConverter::GetBytes(int(StructClass::MessageType::SignUp)));
 
 		//add Username info
 		if (userName != nullptr)
@@ -37,7 +37,7 @@ public:
 	}
 
 
-	StructClass^ unpack(array<Byte>^ buffer) override {
+	virtual StructClass^ unpack(array<Byte>^ buffer) override {
 		int offset = 4; //Skip messageType
 		int usernameLength, passwordLength;
 
@@ -55,7 +55,6 @@ public:
 
 		return this;
 	}
-
 
 };
 

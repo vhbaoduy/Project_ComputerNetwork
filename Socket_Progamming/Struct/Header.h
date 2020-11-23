@@ -1,9 +1,9 @@
 #pragma once
 #include "Struct.h"
-
-#include "Account.h"
+#include "LogInClass.h"
 #include "ResponseLogIn.h"
 #include "LogInNotification.h"
+#include "SignUpClass.h"
 #include "ResponseSignUp.h"
 
 
@@ -22,13 +22,19 @@ public:
 
 			switch (messageType)
 			{
+			case StructClass::MessageType::LogIn:
+				result = gcnew LogInClass();
+				result->messageType = StructClass::MessageType::LogIn;
+				result->unpack(buffer);
+
+				break;
 			case StructClass::MessageType::ResponseLogin:
 				result = gcnew ResponseLogIn();
 				result->messageType = StructClass::MessageType::ResponseLogin;
 				result->unpack(buffer);
 				break;
 			case StructClass::MessageType::SignUp:
-				result = gcnew Account();
+				result = gcnew SignUpClass();
 				result->messageType = StructClass::MessageType::SignUp;
 				result->unpack(buffer);
 
