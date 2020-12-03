@@ -44,6 +44,12 @@
     <ClInclude Include="MainForm.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="PrivateChatForm.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PrivateChatInfo.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -62,6 +68,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="MainForm.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PrivateChatForm.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

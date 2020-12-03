@@ -10,7 +10,7 @@ using namespace System::Threading; //Thread
 ref class StructClass abstract
 {
 public:
-	enum class MessageType{LogIn, ResponseLogin, SignUp, ResponseSignUp, LogInNotification, LogOutNotification};
+	enum class MessageType { LogIn, ResponseLogin, SignUp, ResponseSignUp, LogInNotification, LogOutNotification, PublicChat, PrivateChat, UserStatus, RequestSendFile, ResponseSendFile, PrivateFile };
 	MessageType messageType;
 	virtual array<Byte>^ pack() = 0;
 	virtual StructClass^ unpack(array<Byte>^ buffer) = 0;

@@ -15,7 +15,7 @@ System::Void Form_Client::ConnectServer::button_connect_Click(System::Object^ se
 		MessageBox::Show("Connected!");
 		controller->connectScreen->Hide();
 		controller->logInScreen = gcnew LogIn;
-		controller->logInScreen->ShowDialog();
+		controller->logInScreen->Show();
 		//Application::Run(controller->logInScreen);
 	}
 

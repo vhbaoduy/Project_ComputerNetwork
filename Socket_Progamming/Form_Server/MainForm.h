@@ -54,8 +54,10 @@ namespace Form_Server {
 
 
 	private: System::Windows::Forms::TextBox^ textBox_listClients;
-	private: System::Windows::Forms::TextBox^ textBox_boxChat;
-	private: System::Windows::Forms::Label^ label_BoxChat;
+	private: System::Windows::Forms::TextBox^ textBox_chatBox;
+
+	private: System::Windows::Forms::Label^ label_chatBox;
+
 
 
 
@@ -81,8 +83,8 @@ namespace Form_Server {
 			this->button_RunServer = (gcnew System::Windows::Forms::Button());
 			this->backgroundWorker1 = (gcnew System::ComponentModel::BackgroundWorker());
 			this->textBox_listClients = (gcnew System::Windows::Forms::TextBox());
-			this->textBox_boxChat = (gcnew System::Windows::Forms::TextBox());
-			this->label_BoxChat = (gcnew System::Windows::Forms::Label());
+			this->textBox_chatBox = (gcnew System::Windows::Forms::TextBox());
+			this->label_chatBox = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// label_Top2
@@ -156,32 +158,32 @@ namespace Form_Server {
 			this->textBox_listClients->Size = System::Drawing::Size(198, 115);
 			this->textBox_listClients->TabIndex = 9;
 			// 
-			// textBox_boxChat
+			// textBox_chatBox
 			// 
-			this->textBox_boxChat->Location = System::Drawing::Point(240, 110);
-			this->textBox_boxChat->Multiline = true;
-			this->textBox_boxChat->Name = L"textBox_boxChat";
-			this->textBox_boxChat->ReadOnly = true;
-			this->textBox_boxChat->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
-			this->textBox_boxChat->Size = System::Drawing::Size(263, 228);
-			this->textBox_boxChat->TabIndex = 10;
+			this->textBox_chatBox->Location = System::Drawing::Point(240, 110);
+			this->textBox_chatBox->Multiline = true;
+			this->textBox_chatBox->Name = L"textBox_chatBox";
+			this->textBox_chatBox->ReadOnly = true;
+			this->textBox_chatBox->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
+			this->textBox_chatBox->Size = System::Drawing::Size(263, 228);
+			this->textBox_chatBox->TabIndex = 10;
 			// 
-			// label_BoxChat
+			// label_chatBox
 			// 
-			this->label_BoxChat->AutoSize = true;
-			this->label_BoxChat->Location = System::Drawing::Point(237, 90);
-			this->label_BoxChat->Name = L"label_BoxChat";
-			this->label_BoxChat->Size = System::Drawing::Size(64, 17);
-			this->label_BoxChat->TabIndex = 11;
-			this->label_BoxChat->Text = L"Box Chat";
+			this->label_chatBox->AutoSize = true;
+			this->label_chatBox->Location = System::Drawing::Point(237, 90);
+			this->label_chatBox->Name = L"label_chatBox";
+			this->label_chatBox->Size = System::Drawing::Size(64, 17);
+			this->label_chatBox->TabIndex = 11;
+			this->label_chatBox->Text = L"Chat Box";
 			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(515, 368);
-			this->Controls->Add(this->label_BoxChat);
-			this->Controls->Add(this->textBox_boxChat);
+			this->Controls->Add(this->label_chatBox);
+			this->Controls->Add(this->textBox_chatBox);
 			this->Controls->Add(this->textBox_listClients);
 			this->Controls->Add(this->button_RunServer);
 			this->Controls->Add(this->label_listOfClients);
@@ -206,7 +208,7 @@ namespace Form_Server {
 
 	public: Thread^ threadListenClient;
 	public: void updateConnectedClient(List<String^>^ clients);
-	public: void appendTextToBoxChat(String^ text);
+	public: void appendTextToChatBox(String^ text);
 
 };
 

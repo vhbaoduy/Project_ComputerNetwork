@@ -1,30 +1,16 @@
 #pragma once
 
-//#include <iostream>
-//#include <winsock2.h>
-//#include <ws2tcpip.h>
-//#include <string>
-//#include <thread>
-//#include <vector>
-//#include <stdexcept>
-//#include <sstream>
-//#include <iomanip>
 #include "..\Struct\Header.h"
 #include "MainForm.h"
 
 
 
 
-#pragma comment (lib, "Ws2_32.lib")
-#include <cstdint>
 #define MAX_CLIENTS 10
-#define DEFAULT_IP_ADDRESS L"192.168.0.1"
+#define DEFAULT_IP_ADDRESS L"127.128.0.1"
 #define DEFAULT_PORT L"3504"
 #define DEFAULT_BUFFER_LENGTH 512
 
-
-
-const char OPTION_VALUE = 1;
 
 
 //ref class Client {
@@ -52,7 +38,7 @@ public:
 	List<Client^>^ clients = gcnew List<Client^>();
 	String^ test;
 	Socket^ serverSocket = nullptr;
-	int numberOfClients;
+	//int numberOfClients;
 	String^ serverIpAddress;
 	int serverPortAddress;
 
@@ -196,10 +182,11 @@ public:
 		if (checkLogin(userName, pw, errorMessage)) {
 			clients->Add(gcnew Client(clientSocket, userName));
 			this->mainScreen->updateConnectedClient(this->getListOfClient());
-			this->mainScreen->appendTextToBoxChat(userName + " has just onlline !");
+			this->mainScreen->appendTextToChatBox(userName + " has just online !");
 
 			logInResponse(true, errorMessage, clientSocket);
-			//this->mainScreen->updateConnectedClient(this->getListOfClient());
+			sendLogInNotification(userName, clientSocket);	
+			this->mainScreen->updateConnectedClient(this->getListOfClient());
 
 			//sendLogInNotification(userName, clientSocket);
 
@@ -258,16 +245,156 @@ public:
 		clientSocket->Send(buffer);
 	}
 
+	void sendLogOutNotification(Socket^ clientSocket) {
+		LogOutNotification^ logOut = gcnew LogOutNotification;
+		logOut->userName = getUserNameBySocket(clientSocket);
+		array<Byte>^ data = logOut->pack();
+
+		this->mainScreen->appendTextToChatBox(logOut->userName + " has just offline!");
+		
+		removeClientByUserName(logOut->userName);
+		this->mainScreen->updateConnectedClient(getListOfClient());
+		
+		for each (Client ^ client in clients) {
+			if (client->clientSocket != clientSocket)
+				client->clientSocket->Send(data);
+		}
+
+	}
+	void sendLogOutNotification(String^userName,Socket^ clientSocket) {
+		LogOutNotification^ logOut = gcnew LogOutNotification;
+		logOut->userName = userName;
+		array<Byte>^ data = logOut->pack();
+
+		this->mainScreen->appendTextToChatBox(logOut->userName + " has just offline!");
+
+		removeClientByUserName(logOut->userName);
+		this->mainScreen->updateConnectedClient(getListOfClient());
+
+		for each (Client ^ client in clients) {
+			if (client->clientSocket != clientSocket)
+				client->clientSocket->Send(data);
+		}
+
+	}
 
 
+	void userStatusResponse(Socket^ clientSocket) {
+		UserStatusClass^ userStatus = gcnew UserStatusClass();
+		userStatus->listUser = getListOfClient()->ToArray();
 
+		array<Byte>^ data = userStatus->pack();
+
+		clientSocket->Send(data);
+	}
+
+	void sendPublicMessageToClients(String^ message, Socket^ clientSocket) {
+		String^ userName = getUserNameBySocket(clientSocket);
+		String^ publicMessage = userName + ": " + message;
+
+		this->mainScreen->appendTextToChatBox(publicMessage);
+		PublicChat^ sendPublicMessage = gcnew PublicChat();
+		sendPublicMessage->message = publicMessage;
+		array<Byte>^ data = sendPublicMessage->pack();
+
+		for each (Client ^ client in clients) {
+			try {
+				client->clientSocket->Send(data);
+			}
+			catch (Exception^ e) {
+				MessageBox::Show(e->Message, "Error server sendpublic");
+			}
+		}
+		
+
+	}
+
+	int sendPrivateMessage(String^ userNameReceiver, String^ message, Socket^ senderSocket) {
+		String^ sender = getUserNameBySocket(senderSocket);
+		Socket^ receiverSocket = getSocketByUserName(userNameReceiver);
+
+		PrivateChat^ privateMessage = gcnew PrivateChat();
+		if (receiverSocket == nullptr) {
+			privateMessage->message = "Sorry, " + userNameReceiver + " is offline!";
+			privateMessage->userNameReceiver = userNameReceiver;
+			array<Byte>^ data = privateMessage->pack();
+			senderSocket->Send(data);
+		}
+
+		else {
+			this->mainScreen->appendTextToChatBox("From " + sender + " to " + userNameReceiver + ": " + message);
+			privateMessage->message = sender + ": " + message;
+			privateMessage->userNameReceiver = sender;
+			array<Byte>^ data = privateMessage->pack();
+			receiverSocket->Send(data);
+		}
+
+		return 0;
+
+	}
+
+	void requestSendFile(String^ _ToUsername, String^ _FileName, int _iFileSize, Socket^ _ClientSocket)
+	{
+		String^ sender = getUserNameBySocket(_ClientSocket);
+		RequestSendFile^ rqSendFileStruct = gcnew RequestSendFile;
+		rqSendFileStruct->userName = sender;
+		rqSendFileStruct->fileName = _FileName;
+		rqSendFileStruct->iFileSize = _iFileSize;
+
+		Socket^ receiver = getSocketByUserName(_ToUsername);
+		array<Byte>^ byteData = rqSendFileStruct->pack();
+		receiver->Send(byteData);
+	}
+	void responseSendFile(String^ _ToUsername, bool _IsAccept, Socket^ _ClientSocket)
+	{
+		String^ sender = getUserNameBySocket(_ClientSocket);
+		ResponseSendFile^ rpSendFileStruct = gcnew ResponseSendFile;
+		rpSendFileStruct->userName = sender;
+		rpSendFileStruct->isAccept = _IsAccept;
+
+		Socket^ receiver = getSocketByUserName(_ToUsername);
+		array<Byte>^ byteData = rpSendFileStruct->pack();
+		receiver->Send(byteData);
+	}
+
+	void sendPrivateFilePackage(String^ _ToUsername, String^ _Filename, int _iPackageNumber, int _TotalPackage, array<Byte>^ _bData, Socket^ _ClientSocket)
+	{
+		String^ sender = getUserNameBySocket(_ClientSocket);
+		PrivateFile^ prvFile = gcnew PrivateFile();
+		prvFile->userName = sender;
+		prvFile->fileName = _Filename;
+		prvFile->bData = _bData;
+		//System::Array::Copy(_bData, 0, prvFile->bData, 0, _bData->Length);
+		prvFile->iPackageNumber = _iPackageNumber;
+		prvFile->iTotalPackage = _TotalPackage;
+
+		array<Byte>^ byteData = prvFile->pack();
+		Socket^ receiver = getSocketByUserName(_ToUsername);
+		receiver->Send(byteData);
+	}
+
+	//void sendPrivateFilePackage(String^ _ToUsername, String^ _Filename, int _iPackageNumber, array<Byte>^ _bData, Socket^ _ClientSocket)
+	//{
+	//	String^ sender = getUserNameBySocket(_ClientSocket);
+	//	PrivateFile^ prvFile = gcnew PrivateFile();
+	//	prvFile->userName = sender;
+	//	prvFile->fileName = _Filename;
+	//	prvFile->bData = _bData;
+	//	//System::Array::Copy(_bData, 0, prvFile->bData, 0, _bData->Length);
+	//	prvFile->iPackageNumber = _iPackageNumber;
+	//	//prvFile->iTotalPackage = _TotalPackage;
+
+	//	array<Byte>^ byteData = prvFile->pack();
+	//	Socket^ receiver = getSocketByUserName(_ToUsername);
+	//	receiver->Send(byteData);
+	//}
 
 
 
 	// others
 
 	List<String^>^ getListOfClient() {
-		List<String^>^ list = gcnew List<String^>();
+		List<String^>^ list = gcnew List<String^>;
 
 
 		for each (Client ^ client in clients) {
@@ -286,10 +413,23 @@ public:
 
 		return nullptr;
 	}
+
+
+	String^ getUserNameBySocket(Socket^ clientSocket) {
+		for each (Client ^ client in clients) {
+			if (client->clientSocket == clientSocket)
+				return client->userName;
+		}
+
+		return nullptr;
+	}
 	void removeClientByUserName(String^ userName) {
 		for each (Client ^ client in clients) {
-			if (client->userName == userName)
+			if (client->userName == userName) {
 				clients->Remove(client);
+				break;
+			}
+				
 		}
 	}
 

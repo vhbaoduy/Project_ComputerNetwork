@@ -97,7 +97,7 @@ namespace Form_Client {
 			// 
 			// button_connect
 			// 
-			this->button_connect->Location = System::Drawing::Point(84, 189);
+			this->button_connect->Location = System::Drawing::Point(91, 189);
 			this->button_connect->Name = L"button_connect";
 			this->button_connect->Size = System::Drawing::Size(151, 39);
 			this->button_connect->TabIndex = 10;

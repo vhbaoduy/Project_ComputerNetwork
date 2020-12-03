@@ -14,6 +14,7 @@ System::Void Form_Client::LogIn::button_LogIn_Click(System::Object^ sender, Syst
 	String^ passWord = this->textBox_Password->Text;
 
 	CentralController::getObject()->logIn(userName, passWord);
+	CentralController::getObject()->userName = userName;
 	//CentralController::getObject()->createThreadListenMessageFromServer();
 }
 
@@ -23,6 +24,7 @@ System::Void Form_Client::LogIn::button_SignUp_Click(System::Object^ sender, Sys
 	String^ passWord = this->textBox_Password->Text;
 
 	CentralController::getObject()->signUp(userName, passWord);
+	
 	//CentralController::getObject()->createThreadListenMessageFromServer();
 }
 

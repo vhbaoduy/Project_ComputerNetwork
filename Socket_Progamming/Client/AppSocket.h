@@ -26,7 +26,9 @@ public:
 		serverPortAddress = port;
 		this->initializeSocket();
 	}
-
+	~AppSocket() {
+		delete clientSocket;
+	}
 	int createSocket() {
 		if (clientSocket == nullptr)
 			clientSocket = gcnew Socket(AddressFamily::InterNetwork,SocketType::Stream,ProtocolType::Tcp);
@@ -74,6 +76,15 @@ public:
 
 
 		return 0;
+	}
+
+	void sendFile(String^ fileName) {
+		if (this->clientSocket != nullptr)
+			clientSocket->SendFile(fileName);
+		//clientSocket->Rece
+			//clientSocket->SendFile()
+
+		//return
 	}
 };
 

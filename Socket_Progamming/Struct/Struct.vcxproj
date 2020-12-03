@@ -147,13 +147,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PrivateChat.h" />
+    <ClInclude Include="PrivateFile.h" />
+    <ClInclude Include="PublicChat.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="LogInNotification.h" />
+    <ClInclude Include="LogOutNotification.h" />
+    <ClInclude Include="RequestSendFile.h" />
     <ClInclude Include="ResponseLogIn.h" />
+    <ClInclude Include="ResponseSendFile.h" />
     <ClInclude Include="ResponseSignUp.h" />
     <ClInclude Include="SignUpClass.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="LogInClass.h" />
+    <ClInclude Include="UserStatusClass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

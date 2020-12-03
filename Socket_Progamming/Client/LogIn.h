@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace Form_Client {
 
@@ -41,6 +41,10 @@ namespace Form_Client {
 	private: System::Windows::Forms::TextBox^ textBox_Password;
 	private: System::Windows::Forms::Button^ button_SignUp;
 	private: System::Windows::Forms::Button^ button_LogIn;
+	private: System::Windows::Forms::RadioButton^ radioButtonEncode;
+	private: System::Windows::Forms::Label^ label_note;
+
+
 
 	private:
 		/// <summary>
@@ -61,6 +65,8 @@ namespace Form_Client {
 			this->textBox_Password = (gcnew System::Windows::Forms::TextBox());
 			this->button_SignUp = (gcnew System::Windows::Forms::Button());
 			this->button_LogIn = (gcnew System::Windows::Forms::Button());
+			this->radioButtonEncode = (gcnew System::Windows::Forms::RadioButton());
+			this->label_note = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// label_userName
@@ -99,7 +105,7 @@ namespace Form_Client {
 			// 
 			// button_SignUp
 			// 
-			this->button_SignUp->Location = System::Drawing::Point(58, 226);
+			this->button_SignUp->Location = System::Drawing::Point(58, 237);
 			this->button_SignUp->Name = L"button_SignUp";
 			this->button_SignUp->Size = System::Drawing::Size(97, 30);
 			this->button_SignUp->TabIndex = 4;
@@ -109,7 +115,7 @@ namespace Form_Client {
 			// 
 			// button_LogIn
 			// 
-			this->button_LogIn->Location = System::Drawing::Point(209, 226);
+			this->button_LogIn->Location = System::Drawing::Point(209, 237);
 			this->button_LogIn->Name = L"button_LogIn";
 			this->button_LogIn->Size = System::Drawing::Size(97, 30);
 			this->button_LogIn->TabIndex = 5;
@@ -117,11 +123,34 @@ namespace Form_Client {
 			this->button_LogIn->UseVisualStyleBackColor = true;
 			this->button_LogIn->Click += gcnew System::EventHandler(this, &LogIn::button_LogIn_Click);
 			// 
+			// radioButtonEncode
+			// 
+			this->radioButtonEncode->AutoSize = true;
+			this->radioButtonEncode->Location = System::Drawing::Point(97, 169);
+			this->radioButtonEncode->Name = L"radioButtonEncode";
+			this->radioButtonEncode->Size = System::Drawing::Size(209, 21);
+			this->radioButtonEncode->TabIndex = 7;
+			this->radioButtonEncode->TabStop = true;
+			this->radioButtonEncode->Text = L"Not encrypted when sending";
+			this->radioButtonEncode->UseVisualStyleBackColor = true;
+			this->radioButtonEncode->CheckedChanged += gcnew System::EventHandler(this, &LogIn::radioButton2_CheckedChanged);
+			// 
+			// label_note
+			// 
+			this->label_note->AutoSize = true;
+			this->label_note->Location = System::Drawing::Point(43, 196);
+			this->label_note->Name = L"label_note";
+			this->label_note->Size = System::Drawing::Size(303, 17);
+			this->label_note->TabIndex = 8;
+			this->label_note->Text = L"Default: User name and password is encrypted";
+			// 
 			// LogIn
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(391, 332);
+			this->Controls->Add(this->label_note);
+			this->Controls->Add(this->radioButtonEncode);
 			this->Controls->Add(this->button_LogIn);
 			this->Controls->Add(this->button_SignUp);
 			this->Controls->Add(this->textBox_Password);
@@ -140,6 +169,10 @@ namespace Form_Client {
 	private: System::Void button_SignUp_Click(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void LogIn_Load(System::Object^ sender, System::EventArgs^ e);
 private: System::Void textBox_Password_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+}
+private: System::Void radioButton2_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+}
+private: System::Void radioButton1_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 }
 };
 }

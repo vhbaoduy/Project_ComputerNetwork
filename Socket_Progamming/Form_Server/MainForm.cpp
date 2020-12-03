@@ -10,7 +10,7 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 	this->textBox_Port->Text = Convert::ToString(server->serverPortAddress);
 	this->textBox_listClients->Text = nullptr;
 
-
+	this->updateConnectedClient(server->getListOfClient());
 	this->updateConnectedClient(server->getListOfClient());
 }
 
@@ -36,11 +36,11 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 	 Socket^ socket = (Socket^)obj;
 	 while (1) {
 		 try {
-			 array<Byte>^ buffer = gcnew array<Byte>(512);
+			 array<Byte>^ buffer = gcnew array<Byte>(1024);
 			 int receive = socket->Receive(buffer);
+			 //MessageBox::Show(Convert::ToString(buffer->Length));
 			 StructClass^ messageReceived = ProcessApp::unpack(buffer);
-
-
+			
 
 			 switch (messageReceived->messageType)
 			 {
@@ -57,7 +57,62 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 				 break;
 
 			 }
+			 case StructClass::MessageType::LogOutNotification:
+			 {
+				 LogOutNotification^ logOut = (LogOutNotification^)messageReceived;
+				 Server::getObject()->sendLogOutNotification(logOut->userName,socket);
+				 break;
+			 }
+			 case StructClass::MessageType::UserStatus:
+			 {
+				 //UserStatusClass^ userStatus = (UserStatusClass^)messageReceived;
+				 Server::getObject()->userStatusResponse(socket);
+				 break;
+			 }
 
+			 case StructClass::MessageType::PublicChat:
+			 {
+				 PublicChat^ publicMessage = (PublicChat^)messageReceived;
+				 Server::getObject()->sendPublicMessageToClients(publicMessage->message,socket);
+				 break;
+			 }
+			 case StructClass::MessageType::PrivateChat:
+			 {
+				 PrivateChat^ privateMsgStr = (PrivateChat^)messageReceived;
+				 Server::getObject()->sendPrivateMessage(privateMsgStr->userNameReceiver, privateMsgStr->message, socket);
+
+				 break;
+			 }
+
+			 case StructClass::MessageType::RequestSendFile:
+			 {
+				 RequestSendFile^ rqSendFileStruct = (RequestSendFile^)messageReceived;
+				 //MessageBox::Show("Server received\nUsername: " + rqSendFileStruct->userName + "\nFile name: " + rqSendFileStruct->fileName + "\nFile size: " + Convert::ToString(rqSendFileStruct->iFileSize));
+				 Server::getObject()->requestSendFile(rqSendFileStruct->userName, rqSendFileStruct->fileName, rqSendFileStruct->iFileSize, socket);
+				 break;
+			 }
+			 case StructClass::MessageType::ResponseSendFile:
+			 {
+				 ResponseSendFile^ rpSendFileStruct = (ResponseSendFile^)messageReceived;
+				 //MessageBox::Show("Server responsed\nUsername: " + rpSendFileStruct->userName + "isAccept: " + Convert::ToString(rpSendFileStruct->isAccept));
+				 Server::getObject()->responseSendFile(rpSendFileStruct->userName, rpSendFileStruct->isAccept, socket);
+				 break;
+			 }
+
+			 case StructClass::MessageType::PrivateFile:
+			 {
+				 try {
+					 PrivateFile^ prvFile = (PrivateFile^)messageReceived;
+					 //MessageBox::Show("debug private file");
+					 Server::getObject()->sendPrivateFilePackage(prvFile->userName, prvFile->fileName, prvFile->iPackageNumber, prvFile->iTotalPackage, prvFile->bData, socket);
+
+				 }
+				 catch (Exception^e) {
+					 MessageBox::Show(e->Message, "Error Server(Private File)");
+				 }
+
+				 break;
+			 }
 
 			 default:
 				 break;
@@ -87,6 +142,7 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 		 threadListenClient->Start(connectionSocket); //Listen messages from client
 
 	 }
+
  }
 
 
@@ -99,8 +155,8 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 
 }
 
- void Form_Server::MainForm::appendTextToBoxChat(String^ text) {
-	 this->textBox_boxChat->AppendText(text);
-	 this->textBox_boxChat->AppendText("\r\n");
+ void Form_Server::MainForm::appendTextToChatBox(String^ text) {
+	 this->textBox_chatBox->AppendText(text);
+	 this->textBox_chatBox->AppendText("\r\n");
 
  }
