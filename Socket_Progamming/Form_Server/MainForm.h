@@ -44,8 +44,8 @@ namespace Form_Server {
 
 	private: System::Windows::Forms::Label^ label_Top2;
 	private: System::Windows::Forms::Label^ label_Top3;
-	private: System::Windows::Forms::TextBox^ textBox_IP;
-	private: System::Windows::Forms::TextBox^ textBox_Port;
+	public: System::Windows::Forms::TextBox^ textBox_IP;
+	public: System::Windows::Forms::TextBox^ textBox_Port;
 
 	private: System::Windows::Forms::Label^ label_listOfClients;
 	private: System::Windows::Forms::Button^ button_RunServer;
@@ -110,8 +110,7 @@ namespace Form_Server {
 			this->textBox_IP->Enabled = false;
 			this->textBox_IP->Location = System::Drawing::Point(144, 12);
 			this->textBox_IP->Name = L"textBox_IP";
-			this->textBox_IP->ReadOnly = true;
-			this->textBox_IP->Size = System::Drawing::Size(100, 22);
+			this->textBox_IP->Size = System::Drawing::Size(157, 22);
 			this->textBox_IP->TabIndex = 4;
 			this->textBox_IP->TextChanged += gcnew System::EventHandler(this, &MainForm::textBox_IP_TextChanged);
 			// 
@@ -120,8 +119,7 @@ namespace Form_Server {
 			this->textBox_Port->Enabled = false;
 			this->textBox_Port->Location = System::Drawing::Point(144, 43);
 			this->textBox_Port->Name = L"textBox_Port";
-			this->textBox_Port->ReadOnly = true;
-			this->textBox_Port->Size = System::Drawing::Size(100, 22);
+			this->textBox_Port->Size = System::Drawing::Size(157, 22);
 			this->textBox_Port->TabIndex = 5;
 			this->textBox_Port->TextChanged += gcnew System::EventHandler(this, &MainForm::textBox_Port_TextChanged);
 			// 
@@ -209,6 +207,8 @@ namespace Form_Server {
 	public: Thread^ threadListenClient;
 	public: void updateConnectedClient(List<String^>^ clients);
 	public: void appendTextToChatBox(String^ text);
+	public:static String^ convertStringToHex(String^ input);
+	public:static String^ convertHexToString(String^ hexInput);
 
 };
 

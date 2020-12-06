@@ -126,6 +126,7 @@ namespace Form_Client {
 			this->button_changePassword->TabIndex = 4;
 			this->button_changePassword->Text = L"Change Password";
 			this->button_changePassword->UseVisualStyleBackColor = true;
+			this->button_changePassword->Click += gcnew System::EventHandler(this, &MainForm::button_changePassword_Click);
 			// 
 			// button_logOut
 			// 
@@ -172,8 +173,8 @@ namespace Form_Client {
 			this->listBox_activeUser->Name = L"listBox_activeUser";
 			this->listBox_activeUser->ScrollAlwaysVisible = true;
 			this->listBox_activeUser->Size = System::Drawing::Size(139, 132);
-			this->listBox_activeUser->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::listBox_activeUser_OnMouseDoubleClick);
 			this->listBox_activeUser->TabIndex = 12;
+			this->listBox_activeUser->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::listBox_activeUser_OnMouseDoubleClick);
 			// 
 			// MainForm
 			// 
@@ -212,6 +213,7 @@ namespace Form_Client {
 	private: System::Void button_logOut_Click(System::Object^ sender, System::EventArgs^ e);
 
 	private: System::Void listBox_activeUser_OnMouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e);
+	private: System::Void button_changePassword_Click(System::Object^ sender, System::EventArgs^ e);
 };
 }
 

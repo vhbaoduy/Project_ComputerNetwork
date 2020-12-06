@@ -4,8 +4,6 @@
 #include "MainForm.h"
 
 
-
-
 #define MAX_CLIENTS 10
 #define DEFAULT_IP_ADDRESS L"127.128.0.1"
 #define DEFAULT_PORT L"3504"
@@ -32,6 +30,7 @@ private:
 	int createSocket() {
 		serverSocket = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
 		return !(serverSocket == nullptr);
+		
 	}
 public:
 
@@ -55,13 +54,15 @@ public:
 
 		return instance;
 	}
+
+
 	Server(String^ ip, int port) {
 		this->serverIpAddress = ip;
 		this->serverPortAddress = port;
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "127.128.0.1";
+		this->serverIpAddress = "192.168.18.123";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}
@@ -84,7 +85,6 @@ public:
 
 		return 0;
 	}
-
 
 
 	// Login
@@ -133,6 +133,34 @@ public:
 
 		if (!addAccount(user, password)) {
 			errorMessage = "Can't register!";
+			return false;
+		}
+
+		return true;
+	}
+	bool checkChangePassword(String^ user, String^ oldPw, String^ newPw, String^ confirmPw, String^& errorMessage) {
+		if (String::IsNullOrEmpty(user) || String::IsNullOrEmpty(oldPw) || String::IsNullOrEmpty(newPw)|| String::IsNullOrEmpty(confirmPw)) {
+			errorMessage = "User Name or Password can't be blank !";
+			return false;
+		}
+		if (user->Contains(",") || oldPw->Contains(",") || newPw->Contains(",") || confirmPw->Contains(","))
+		{
+			errorMessage = "Username or password can't contain special characters!";
+			return false;
+		}
+		if (!checkAccountLogin(user, oldPw)) {
+			errorMessage = "Username or password is not correct!";
+			return false;
+		}
+		else {
+			if (oldPw == newPw) {
+				errorMessage = "New password cannot be the same as old password !";
+				return false;
+			}
+		}
+
+		if (newPw != confirmPw) {
+			errorMessage = "Password and confirm password don't match!";
 			return false;
 		}
 
@@ -207,6 +235,41 @@ public:
 		clientSocket->Send(buffer);
 	}
 
+
+	bool changePassword(String^ Username, String^ oldPassword, String^ newPassword, String^ confirmnewPassword, Socket^ _ClientSocket)
+	{
+		String^ errorMsg = "";
+		if (checkChangePassword(Username, oldPassword, newPassword, confirmnewPassword, errorMsg))
+		{
+			array<String^>^ lines = System::IO::File::ReadAllLines(accountPath);
+			//for each (String ^ line in lines)
+			for (int i = 0; i < lines->Length; i++)
+			{
+				//MessageBox::Show(line);
+				if (lines[i] == Username + "," + oldPassword)
+				{
+					//MessageBox::Show(line);
+					//line->Replace(/*Username + "|" + oldPassword*/line, Username + "|" + newPassword);
+					lines[i] = Username + "," + newPassword;
+					break;
+				}
+			}
+			System::IO::File::WriteAllLines(accountPath, lines);
+			changePasswordResponse(true, errorMsg, _ClientSocket);
+			return true;
+		}
+		changePasswordResponse(false, errorMsg, _ClientSocket);
+		return false; //Error 
+	}
+	void changePasswordResponse(bool IsSucc, String^ errorMsg, Socket^ _ClientSocket)
+	{
+		ResponseChangePassword^ resChangePass = gcnew ResponseChangePassword;
+		resChangePass->isSuccessful = IsSucc;
+		resChangePass->errorMessage = errorMsg;
+		array<Byte>^ buff = resChangePass->pack();
+
+		_ClientSocket->Send(buff); //Send the result to client.
+	}
 	void sendLogInNotification(String^ userName, Socket^ clientSocket) {
 		LogInNotification^ lgNoti = gcnew LogInNotification;
 		lgNoti->userName = userName;
@@ -315,14 +378,14 @@ public:
 
 		PrivateChat^ privateMessage = gcnew PrivateChat();
 		if (receiverSocket == nullptr) {
-			privateMessage->message = "Sorry, " + userNameReceiver + " is offline!";
+			privateMessage->message = "[SERVER], " + userNameReceiver + " is offline!";
 			privateMessage->userNameReceiver = userNameReceiver;
 			array<Byte>^ data = privateMessage->pack();
 			senderSocket->Send(data);
 		}
 
 		else {
-			this->mainScreen->appendTextToChatBox("From " + sender + " to " + userNameReceiver + ": " + message);
+			this->mainScreen->appendTextToChatBox("FROM " + sender + " TO " + userNameReceiver + ": " + message);
 			privateMessage->message = sender + ": " + message;
 			privateMessage->userNameReceiver = sender;
 			array<Byte>^ data = privateMessage->pack();
@@ -432,7 +495,7 @@ public:
 				
 		}
 	}
-
+	
 
 
 };

@@ -145,6 +145,9 @@
   <ItemGroup>
     <ClInclude Include="AppSocket.h" />
     <ClInclude Include="CentralController.h" />
+    <ClInclude Include="ChangePasswordForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ConnectServer.h">
       <FileType>CppForm</FileType>
@@ -164,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="ChangePasswordForm.cpp" />
     <ClCompile Include="ConnectServer.cpp" />
     <ClCompile Include="LogIn.cpp" />
     <ClCompile Include="main.cpp" />
@@ -188,6 +192,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ChangePasswordForm.resx">
+      <DependentUpon>ChangePasswordForm.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConnectServer.resx">
       <DependentUpon>ConnectServer.h</DependentUpon>
     </EmbeddedResource>

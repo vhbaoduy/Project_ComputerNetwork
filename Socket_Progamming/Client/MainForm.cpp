@@ -61,6 +61,11 @@ System::Void Form_Client::MainForm::button_sendMsg_Click(System::Object^ sender,
 	this->textBox_inputMessage->Text = nullptr;
 }
 
+System::Void Form_Client::MainForm::button_changePassword_Click(System::Object^ sender, System::EventArgs^ e) {
+	CentralController::getObject()->changePasswordForm = gcnew Form_Client::ChangePasswordForm;
+	CentralController::getObject()->changePasswordForm->Show();
+}
+
 System::Void Form_Client::MainForm::button_logOut_Click(System::Object^ sender, System::EventArgs^ e) {
 	//CentralController::getObject()->logOut();
 	Application::Restart();
@@ -69,8 +74,8 @@ System::Void Form_Client::MainForm::button_logOut_Click(System::Object^ sender, 
 
 System::Void Form_Client::MainForm::MainForm_FormClosing(System::Object^ sender, System::Windows::Forms::FormClosingEventArgs^ e) {
 	CentralController::getObject()->logOut();
-	//CentralController::getObject()->appSocket->clientSocket->Disconnect(false);
-	//CentralController::getObject()->appSocket->clientSocket = nullptr;
+	//CentralController::getObject()->appSocket->clientSocket->Disconnect(true);
+	CentralController::getObject()->appSocket->clientSocket = nullptr;
 	//Application::ExitThread();
 }
 System::Void Form_Client::MainForm::MainForm_FormClosed(System::Object^ sender, System::Windows::Forms::FormClosedEventArgs^ e) {

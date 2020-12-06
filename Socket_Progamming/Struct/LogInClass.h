@@ -1,14 +1,17 @@
 #pragma once
 #include "Struct.h"
+
 ref class LogInClass : public StructClass
 {
 public:
 	String^ userName;
 	String^ passWord;
+	bool isEncrypted;
 
 	LogInClass() {
 		userName = nullptr;
 		passWord = nullptr;
+		isEncrypted = false;
 	}
 
 	virtual array<Byte>^ pack() override {
@@ -25,6 +28,11 @@ public:
 			byteData->AddRange(BitConverter::GetBytes(0));
 
 		//add Password Info
+		// encrypted
+		//if (isEncrypted) {
+		//	passWord = convertStringToHex(passWord);
+		//}
+
 		if (passWord != nullptr)
 		{
 			byteData->AddRange(BitConverter::GetBytes(Encoding::UTF8->GetByteCount(passWord))); //Length of password
@@ -32,6 +40,8 @@ public:
 		}
 		else
 			byteData->AddRange(BitConverter::GetBytes(0));
+
+		byteData->AddRange(BitConverter::GetBytes(isEncrypted));
 
 		return byteData->ToArray();
 	}
@@ -52,7 +62,10 @@ public:
 		offset += 4; //Update offset
 		if (passwordLength > 0)
 			passWord = Encoding::UTF8->GetString(buffer, offset, passwordLength);
-
+		offset += passwordLength;
+		isEncrypted = BitConverter::ToBoolean(buffer,offset);
+		//if (isEncrypted)
+		//	passWord = convertHexToString(passWord);
 		return this;
 	}
 

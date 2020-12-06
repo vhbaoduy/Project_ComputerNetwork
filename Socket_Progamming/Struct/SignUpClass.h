@@ -5,10 +5,12 @@ ref class SignUpClass:public StructClass
 public:
 	String^ userName;
 	String^ passWord;
+	bool isEncrypted;
 
 	SignUpClass() {
 		userName = nullptr;
 		passWord = nullptr;
+		isEncrypted = false;
 	}
 
 	virtual array<Byte>^ pack() override {
@@ -33,6 +35,7 @@ public:
 		else
 			byteData->AddRange(BitConverter::GetBytes(0));
 
+		byteData->AddRange(BitConverter::GetBytes(isEncrypted));
 		return byteData->ToArray();
 	}
 
@@ -53,6 +56,8 @@ public:
 		if (passwordLength > 0)
 			passWord = Encoding::UTF8->GetString(buffer, offset, passwordLength);
 
+		offset += passwordLength;
+		isEncrypted = BitConverter::ToBoolean(buffer, offset);
 		return this;
 	}
 

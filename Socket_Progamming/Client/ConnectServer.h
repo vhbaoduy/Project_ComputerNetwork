@@ -118,6 +118,8 @@ namespace Form_Client {
 			this->Name = L"ConnectServer";
 			this->Text = L"ConnectServer";
 			this->Load += gcnew System::EventHandler(this, &ConnectServer::ConnectServer_Load);
+			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &ConnectServer::ConnectServer_FormClosing);
+			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &ConnectServer::ConnectServer_FormClosed);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -125,5 +127,7 @@ namespace Form_Client {
 #pragma endregion
 	private: System::Void ConnectServer_Load(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void button_connect_Click(System::Object^ sender, System::EventArgs^ e);
+		  private: System::Void ConnectServer_FormClosing(System::Object^ sender, System::Windows::Forms::FormClosingEventArgs^ e);
+	  private: System::Void ConnectServer_FormClosed(System::Object^ sender, System::Windows::Forms::FormClosedEventArgs^ e);
 };
 }

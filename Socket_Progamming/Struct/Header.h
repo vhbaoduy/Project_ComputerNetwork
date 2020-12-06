@@ -12,6 +12,10 @@
 #include "RequestSendFile.h"
 #include "ResponseSendFile.h"
 #include "PrivateFile.h"
+#include "ChangePasswordClass.h"
+#include "ResponseChangePassword.h"
+
+
 
 
 ref class ProcessApp
@@ -48,6 +52,18 @@ public:
 			case StructClass::MessageType::ResponseSignUp:
 				result = gcnew ResponseSignUp();
 				result->messageType = StructClass::MessageType::ResponseSignUp;
+				result->unpack(buffer);
+
+				break;
+			case StructClass::MessageType::ChangePassword:
+				result = gcnew ChangePasswordClass();
+				result->messageType = StructClass::MessageType::ChangePassword;
+				result->unpack(buffer);
+
+				break;
+			case StructClass::MessageType::ResponseChangePassword:
+				result = gcnew ResponseChangePassword();
+				result->messageType = StructClass::MessageType::ResponseChangePassword;
 				result->unpack(buffer);
 
 				break;

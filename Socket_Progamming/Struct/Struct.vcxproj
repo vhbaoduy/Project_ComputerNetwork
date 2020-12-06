@@ -87,7 +87,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -115,7 +115,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -147,6 +147,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChangePasswordClass.h" />
     <ClInclude Include="PrivateChat.h" />
     <ClInclude Include="PrivateFile.h" />
     <ClInclude Include="PublicChat.h" />
@@ -154,13 +155,19 @@
     <ClInclude Include="LogInNotification.h" />
     <ClInclude Include="LogOutNotification.h" />
     <ClInclude Include="RequestSendFile.h" />
+    <ClInclude Include="ResponseChangePassword.h" />
     <ClInclude Include="ResponseLogIn.h" />
     <ClInclude Include="ResponseSendFile.h" />
     <ClInclude Include="ResponseSignUp.h" />
+    <ClInclude Include="SecurityFunction.h" />
     <ClInclude Include="SignUpClass.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="LogInClass.h" />
     <ClInclude Include="UserStatusClass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="SecurityFunction.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,7 +12,6 @@ System::Void Form_Client::LogIn::LogIn_Load(System::Object^ sender, System::Even
 System::Void Form_Client::LogIn::button_LogIn_Click(System::Object^ sender, System::EventArgs^ e) {
 	String^ userName = this->textBox_UserName->Text;
 	String^ passWord = this->textBox_Password->Text;
-
 	CentralController::getObject()->logIn(userName, passWord);
 	CentralController::getObject()->userName = userName;
 	//CentralController::getObject()->createThreadListenMessageFromServer();

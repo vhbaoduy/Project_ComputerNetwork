@@ -6,6 +6,7 @@
 #include "AppSocket.h"
 #include "MainForm.h"
 #include "PrivateChatForm.h"
+#include "ChangePasswordForm.h"
 
 
 
@@ -20,6 +21,8 @@ private:
 	//CentralController(String^ ip, int port) {
 	//	appSocket = gcnew AppSocket(ip, port);
 	//}
+
+	
 public:
 	~CentralController() {
 		delete appSocket;
@@ -39,15 +42,25 @@ public:
 	Form_Client::ConnectServer^ connectScreen = nullptr; // connect form
 	Form_Client::LogIn^ logInScreen = nullptr; // login form
 	Form_Client::MainForm^ mainForm = nullptr;
+	Form_Client::ChangePasswordForm^ changePasswordForm = nullptr;
 	
 	Thread^ threadListenClient;
 	String^ userName = nullptr;
-
+	bool flagLogIn;
+	bool flagSignUp;
+	bool flagChangePassword;
 	int logIn(String^ userName, String^ passWord) {
 		LogInClass^ logInAcc = gcnew LogInClass();
 		logInAcc->userName = userName;
 		logInAcc->passWord = passWord;
-		
+		flagLogIn = false;
+		if (MessageBox::Show("Do you want to encrypt message before sending ?", "Notification", MessageBoxButtons::YesNo) == DialogResult::Yes) {
+			logInAcc->isEncrypted = true;
+			logInAcc->userName = convertStringToHex(userName);
+			logInAcc->passWord = convertStringToHex(passWord);
+			flagLogIn = true;
+		}
+
 		array<Byte>^ buffer = logInAcc->pack();
 
 		appSocket->sendMessage(buffer);
@@ -58,6 +71,13 @@ public:
 		SignUpClass^ signUpAcc = gcnew SignUpClass();
 		signUpAcc->userName = userName;
 		signUpAcc->passWord = passWord;
+		flagSignUp = false;
+		if (MessageBox::Show("Do you want to encrypt message before sending ?", "Notification", MessageBoxButtons::YesNo) == DialogResult::Yes) {
+			signUpAcc->isEncrypted = true;
+			signUpAcc->userName = convertStringToHex(userName);
+			signUpAcc->passWord = convertStringToHex(passWord);
+			flagSignUp = true;
+		}
 		array<Byte>^ buffer = signUpAcc->pack();
 		appSocket->sendMessage(buffer);
 
@@ -83,6 +103,27 @@ public:
 		return 0;
 	}
 
+	int changePassword(String^ userName,String^ oldPw,String^ newPw,String^ confirmPw) {
+		ChangePasswordClass^ changePw = gcnew ChangePasswordClass();
+		changePw->userName = userName;
+		changePw->oldPassword = oldPw;
+		changePw->newPassword = newPw;
+		changePw->confirmPassword = confirmPw;
+		flagChangePassword = false;
+		if (MessageBox::Show("Do you want to encrypt message before sending ?", "Notification", MessageBoxButtons::YesNo) == DialogResult::Yes) {
+			changePw->isEncrypted = true;
+			changePw->userName = convertStringToHex(userName);
+			changePw->oldPassword = convertStringToHex(oldPw);
+			changePw->newPassword = convertStringToHex(newPw);
+			changePw->confirmPassword = convertStringToHex(confirmPw);
+			flagChangePassword = true;
+		}
+
+		array<Byte>^ data = changePw->pack();
+		this->appSocket->sendMessage(data);
+		return 0;
+	}
+
 	int sendPublicMassage(String^ message) {
 		PublicChat^ publicMsg = gcnew PublicChat();
 		publicMsg->message = message;
@@ -102,7 +143,7 @@ public:
 				receive = clientSocket->Receive(buffer);
 			}
 			catch(Exception^ e){
-				MessageBox::Show("Server has just disconnected!");
+				//MessageBox::Show("Server has just disconnected!");
 				//CentralController::getObject()->appSocket->clientSocket->Disconnect(true);
 				CentralController::getObject()->appSocket->clientSocket = nullptr;
 				Application::Exit();
@@ -119,11 +160,18 @@ public:
 			{
 				ResponseLogIn^ responseLogIn = (ResponseLogIn^)messageReceived;
 				if (responseLogIn->isSuccessful) {
-					MessageBox::Show("LogIn successfully!","Notification",MessageBoxButtons::OK);
-					//CentralController::getObject()->connectScreen->Hide();
-					CentralController::getObject()->logInScreen->Hide();
+					if (flagLogIn) {
+						MessageBox::Show("LogIn successfully! \n Wellcome to server and Message was encrypted.", "Notification", MessageBoxButtons::OK);
+					}
+					else
+						MessageBox::Show("LogIn successfully! \n Wellcome to server and Message wasn't encrypted.", "Notification", MessageBoxButtons::OK);
+
+
+					CentralController::getObject()->connectScreen->Close();
+					CentralController::getObject()->logInScreen->Close();
 					CentralController::getObject()->mainForm = gcnew Form_Client::MainForm;
-					CentralController::getObject()->mainForm->ShowDialog();
+					//CentralController::getObject()->mainForm->Show();
+					Application::Run(CentralController::getObject()->mainForm);
 					// main screen show
 				}
 				else {
@@ -141,13 +189,37 @@ public:
 			{
 				ResponseSignUp^ responseSignUp = (ResponseSignUp^)messageReceived;
 				if (responseSignUp->isSuccessful) {
-					MessageBox::Show("Registered successfully!","Notificaion");
-					// main screen show
+					if (flagSignUp) {
+						MessageBox::Show("Register successfully and Message was encrypted.", "Notification", MessageBoxButtons::OK);
+					}
+					else
+						MessageBox::Show("Register successfully and Message wasn't encrypted.", "Notification", MessageBoxButtons::OK);
+
 				}
 				else {
 					MessageBox::Show(responseSignUp->errorMessage);
 				}
 
+				break;
+			}
+			case StructClass ::MessageType :: ChangePassword:
+				break;
+			case StructClass::MessageType::ResponseChangePassword:
+			{
+				ResponseChangePassword^ resChangePw = (ResponseChangePassword^)messageReceived;
+				if (resChangePw->isSuccessful) {
+					if (flagChangePassword) {
+						MessageBox::Show("Changed password successfully and Message was encrypted.", "Notification", MessageBoxButtons::OK);
+						
+					}
+					else
+						MessageBox::Show("Changed password successfully and Message wasn't encrypted.", "Notification", MessageBoxButtons::OK);
+					CentralController::getObject()->changePasswordForm->Close();
+				}
+				else {
+					MessageBox::Show(resChangePw->errorMessage);
+				}
+		
 				break;
 			}
 			case StructClass::MessageType::LogInNotification:
@@ -416,6 +488,31 @@ public:
 		//MessageBox::Show("Debug");
 		pChat->Show();
 		MessageBox::Show("End Debug thread");
+	}
+	static String^ convertStringToHex(String^ input)
+	{
+		List<Byte>^ stringBytes = gcnew List<Byte>();
+		stringBytes->AddRange(Encoding::UTF8->GetBytes(input));
+		// Byte[] stringBytes = encoding.GetBytes(input);
+		array<Byte>^ temp = stringBytes->ToArray();
+		StringBuilder^ sbBytes = gcnew StringBuilder(temp->Length * 2);
+		for each (Byte b in temp)
+		{
+			sbBytes->AppendFormat("{0:X2}", b);
+		}
+		return sbBytes->ToString();
+	}
+
+	static String^ convertHexToString(String^ hexInput)
+	{
+		int numberChars = hexInput->Length;
+		array<Byte>^ bytes = gcnew array<Byte>(numberChars / 2);
+		// byte[] bytes = new byte[numberChars / 2];
+		for (int i = 0; i < numberChars; i += 2)
+		{
+			bytes[i / 2] = Convert::ToByte(hexInput->Substring(i, 2), 16);
+		}
+		return Encoding::UTF8->GetString(bytes);
 	}
 	//Thread^ threadListenClient;
 };
