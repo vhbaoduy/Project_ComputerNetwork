@@ -4,10 +4,7 @@
 #include "MainForm.h"
 
 
-#define MAX_CLIENTS 10
-#define DEFAULT_IP_ADDRESS L"127.128.0.1"
-#define DEFAULT_PORT L"3504"
-#define DEFAULT_BUFFER_LENGTH 512
+#define DEFAULT_BUFFER_LENGTH 102912 // buffer file + buffer others
 
 
 
@@ -62,7 +59,7 @@ public:
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "192.168.18.123";
+		this->serverIpAddress = "192.168.1.30";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}

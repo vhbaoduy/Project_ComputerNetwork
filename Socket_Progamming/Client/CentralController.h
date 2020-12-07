@@ -8,7 +8,8 @@
 #include "PrivateChatForm.h"
 #include "ChangePasswordForm.h"
 
-
+#define DEFAULT_BUFFER_LENGTH 102912
+#define BUFFER_SIZE 102400
 
 ref class CentralController
 {
@@ -135,7 +136,7 @@ public:
 
 	System::Void listenMessage() {
 		while (1) {
-			array<Byte>^ buffer = gcnew array<Byte>(1024);
+			array<Byte>^ buffer = gcnew array<Byte>(DEFAULT_BUFFER_LENGTH);
 			Socket^ clientSocket = CentralController::getObject()->appSocket->clientSocket;
 
 			int receive;
@@ -300,16 +301,27 @@ public:
 			{
 				try {
 					PrivateFile^ prvFile = (PrivateFile^)messageReceived;
-					//MessageBox::Show("debug private file");
-					setPrivateMessage(prvFile->userName, "Received: " + prvFile->iPackageNumber + "/" + prvFile->iTotalPackage);
+					setPrivateMessage(prvFile->userName, "Receiving...");
 					Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
-					//MessageBox::Show("debug private file");
+					//else
+						//setPrivateMessage(prvFile->userName, nullptr);
 					if (prvFile->iPackageNumber == 1) {
+						CentralController::getObject()->createThreadListenMessageFromServer();
+						prvChatForm->setUpProcessBar(1, prvFile->iTotalPackage);
 						prvChatForm->writerStream = gcnew System::IO::FileStream(prvChatForm->pathFileToReceiver + prvFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
-					}
-					prvChatForm->writerStream->Write(prvFile->bData, 0, prvFile->bData->Length);
 					
-		
+					}
+					//prvChatForm->fileSizeToSend += prvFile->bData->Length;
+					prvChatForm->writerStream->Write(prvFile->bData, 0, prvFile->bData->Length);
+					prvChatForm->setValueOfProcessBar(prvFile->iPackageNumber);
+
+					if (prvFile->iPackageNumber == prvFile->iTotalPackage) {
+						setPrivateMessage(prvFile->userName, "Received " + prvFile->fileName + "(" + Convert::ToString((int)prvChatForm->writerStream->Length) + "bytes)  successfully !");
+						prvChatForm->resetProcessBar();
+						prvChatForm->writerStream->Close();
+						prvChatForm->writerStream = nullptr;
+					}
+					
 				}
 				catch (Exception^ e) {
 					MessageBox::Show(e->Message, "Error Client(Private File)");
@@ -357,9 +369,9 @@ public:
 		PrivateFile^ prvFile = gcnew PrivateFile;
 		prvFile->fileName = _FileName;
 		prvFile->userName = _ToUsername;
-	
+		//setPrivateMessage(_ToUsername, "Sending...");
+		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
 		//Spit to smaller packages to send to server
-
 		array<Byte>^ buffer;
 
 		System::IO::FileStream^ fileStream = nullptr;
@@ -380,20 +392,22 @@ public:
 				sum += count;
 			}
 
-			int BUFF_SIZE = 512;
+			//int BUFF_SIZE = 102400;
 			int counter = 0;
 			int curPackageNumber = 1;
-			int iTotalPackage = sum / (BUFF_SIZE + 1) + 1;
+			int iTotalPackage = sum / (BUFFER_SIZE + 1) + 1;
 			//Console::WriteLine("Start send file: ");
+			prvChatForm->setUpProcessBar(curPackageNumber, iTotalPackage);
+			
 			for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
 			{
 				//System::Array::Copy(buffer, counter, bData, BUFF_SIZE);
 				
-				int copyLength = counter + BUFF_SIZE < sum ? BUFF_SIZE : (sum % BUFF_SIZE);
+				int copyLength = counter + BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
 				array<Byte>^ bData = gcnew array<Byte>(copyLength);
 				//MessageBox::Show(Convert::ToString(copyLength));
 				System::Array::Copy(buffer, counter, bData, 0, copyLength);
-				counter += BUFF_SIZE;
+				counter += BUFFER_SIZE;
 				//MessageBox::Show(Convert::ToString(bData->Length));
 
 				prvFile->iPackageNumber = curPackageNumber;
@@ -404,16 +418,17 @@ public:
 				array<Byte>^ byteData = prvFile->pack();
 				//MessageBox::Show(Convert::ToString(byteData->Length));
 				//if (byteData != nullptr)
-				appSocket->sendMessage(byteData);
-				
 
-				//MessageBox::Show("Debug");
-				setPrivateMessage(_ToUsername, "Sent: " + curPackageNumber + "/" + iTotalPackage);
-				//appSocket->clientSocket->SySendPacketsElement(_FilePath);
-				//writeSteam->Write(bData, 0, copyLength);
+				setPrivateMessage(_ToUsername, "Sending...");
+
+				appSocket->sendMessage(byteData);
+				//setPrivateFileProcess(_ToUsername,curPackageNumber);
+				prvChatForm->setValueOfProcessBar(curPackageNumber);
+				delete[] bData;
 			}
 			//Console::WriteLine("End of sending file");
 			//CentralController::getObject()->appSocket->clientSocket->SendFile()
+			
 		}
 		catch (Exception^ e)
 		{
@@ -421,8 +436,11 @@ public:
 		}
 		finally
 		{
-			if (fileStream != nullptr)
+			if (fileStream != nullptr) {
 				fileStream->Close();
+				prvChatForm->resetProcessBar();
+				setPrivateMessage(_ToUsername, "Sent " + prvFile->fileName + "(" + Convert::ToString(prvChatForm->fileSizeToSend) + "bytes)  successfully !");
+			}
 		}
 
 
@@ -449,8 +467,8 @@ public:
 	{
 		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
 		if (prvChatForm != nullptr)
-		{
-			prvChatForm->addTextToDisplayChatBox(_Message);
+		{		
+				prvChatForm->addTextToDisplayChatBox(_Message);
 		}
 		else
 		{
@@ -466,7 +484,45 @@ public:
 
 		return 0;
 	}
+	int setPrivateMessage(String^ _ToUsername)
+	{
+		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
+		if (prvChatForm != nullptr)
+		{
+		}
+		else
+		{
+			Form_Client::PrivateChatForm^ pChat = gcnew Form_Client::PrivateChatForm(this->userName, _ToUsername);
+			CentralController::getObject()->lstPrivateChatForm->Add(pChat);
+			Application::Run(pChat);
+			//threadListenClient = gcnew Thread(gcnew ParameterizedThreadStart(CentralController::threadPrivateChatForm));
+			//threadListenClient->IsBackground = true;
+			//threadListenClient->Start(pChat);
+		}
 
+		return 0;
+	}
+	int setPrivateFileProcess(String^ _ToUsername, int value)
+	{
+		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
+		if (prvChatForm != nullptr)
+		{
+			prvChatForm->setValueOfProcessBar(value);
+		}
+		else
+		{
+			Form_Client::PrivateChatForm^ pChat = gcnew Form_Client::PrivateChatForm(this->userName, _ToUsername);
+			CentralController::getObject()->lstPrivateChatForm->Add(pChat);
+			setPrivateFileProcess(_ToUsername, value); //Re set private message
+
+			Application::Run(pChat);
+			//threadListenClient = gcnew Thread(gcnew ParameterizedThreadStart(CentralController::threadPrivateChatForm));
+			//threadListenClient->IsBackground = true;
+			//threadListenClient->Start(pChat);
+		}
+
+		return 0;
+	}
 	//Others
 	Form_Client::PrivateChatForm^ getPrivateChatFormByFriendUsername(String^ _Username) {
 		for each (Form_Client::PrivateChatForm ^ prvChat in CentralController::getObject()->lstPrivateChatForm)

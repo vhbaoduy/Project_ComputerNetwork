@@ -6,8 +6,8 @@ void Form_Client::PrivateChatForm::setCaption(String^ txtCaption) {
 	this->Text = txtCaption;
 }
 void Form_Client::PrivateChatForm::addTextToDisplayChatBox(String^ text) {
-	this->textBox_boxChat->AppendText(text);
-	this->textBox_boxChat->AppendText("\r\n");
+		this->textBox_boxChat->AppendText(text);
+		this->textBox_boxChat->AppendText("\r\n");
 
 }
 System::Void Form_Client::PrivateChatForm::PrivateChatForm_Load(System::Object^ sender, System::EventArgs^ e) {
@@ -59,3 +59,16 @@ String^ Form_Client::PrivateChatForm::splitPathFileToReceiver(String^ pathFile) 
 
 	return pathFile;
 }
+
+	void Form_Client::PrivateChatForm::setUpProcessBar(int min, int max) {
+		this->progressBar1->Minimum = min;
+		this->progressBar1->Maximum = max;
+	}
+	void Form_Client::PrivateChatForm::resetProcessBar() {
+		this->progressBar1->Minimum = 0;
+		this->progressBar1->Maximum = 0;
+		this->progressBar1->Value = 0;
+	}
+	void Form_Client::PrivateChatForm::setValueOfProcessBar(int value) {
+		this->progressBar1->Value = value;
+	}

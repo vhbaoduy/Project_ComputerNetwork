@@ -38,7 +38,7 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 	 Socket^ socket = (Socket^)obj;
 	 while (1) {
 		 try {
-			 array<Byte>^ buffer = gcnew array<Byte>(1024);
+			 array<Byte>^ buffer = gcnew array<Byte>(DEFAULT_BUFFER_LENGTH);
 			 int receive = socket->Receive(buffer);
 			 //MessageBox::Show(Convert::ToString(buffer->Length));
 			 StructClass^ messageReceived = ProcessApp::unpack(buffer);

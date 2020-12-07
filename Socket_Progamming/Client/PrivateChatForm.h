@@ -50,13 +50,16 @@ namespace Form_Client {
 	private: System::Windows::Forms::Label^ label_chatBox;
 	private: System::Windows::Forms::TextBox^ textBox_boxChat;
 	private: System::Windows::Forms::TextBox^ textBox_inputMessage;
-	private: System::Windows::Forms::TextBox^ textBox_status;
-	private: System::Windows::Forms::Label^ label_status;
+
+
 	private: System::Windows::Forms::Button^ button_chooseFile;
 	private: System::Windows::Forms::TextBox^ textBox_fileName;
 	private: System::Windows::Forms::Label^ label_fileName;
 	private: System::Windows::Forms::Label^ label_Path;
 	private: System::Windows::Forms::TextBox^ textBox_Path;
+	private: System::Windows::Forms::ProgressBar^ progressBar1;
+	private: System::Windows::Forms::Label^ label1;
+	public:
 
 
 	private:
@@ -76,13 +79,13 @@ namespace Form_Client {
 			this->label_chatBox = (gcnew System::Windows::Forms::Label());
 			this->textBox_boxChat = (gcnew System::Windows::Forms::TextBox());
 			this->textBox_inputMessage = (gcnew System::Windows::Forms::TextBox());
-			this->textBox_status = (gcnew System::Windows::Forms::TextBox());
-			this->label_status = (gcnew System::Windows::Forms::Label());
 			this->button_chooseFile = (gcnew System::Windows::Forms::Button());
 			this->textBox_fileName = (gcnew System::Windows::Forms::TextBox());
 			this->label_fileName = (gcnew System::Windows::Forms::Label());
 			this->label_Path = (gcnew System::Windows::Forms::Label());
 			this->textBox_Path = (gcnew System::Windows::Forms::TextBox());
+			this->progressBar1 = (gcnew System::Windows::Forms::ProgressBar());
+			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// button_sendMsg
@@ -123,31 +126,12 @@ namespace Form_Client {
 			this->textBox_inputMessage->Size = System::Drawing::Size(346, 64);
 			this->textBox_inputMessage->TabIndex = 4;
 			// 
-			// textBox_status
-			// 
-			this->textBox_status->Location = System::Drawing::Point(405, 246);
-			this->textBox_status->Margin = System::Windows::Forms::Padding(4);
-			this->textBox_status->Name = L"textBox_status";
-			this->textBox_status->ReadOnly = true;
-			this->textBox_status->Size = System::Drawing::Size(141, 22);
-			this->textBox_status->TabIndex = 21;
-			// 
-			// label_status
-			// 
-			this->label_status->AutoSize = true;
-			this->label_status->Location = System::Drawing::Point(318, 250);
-			this->label_status->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
-			this->label_status->Name = L"label_status";
-			this->label_status->Size = System::Drawing::Size(78, 17);
-			this->label_status->TabIndex = 20;
-			this->label_status->Text = L"File Status:";
-			// 
 			// button_chooseFile
 			// 
-			this->button_chooseFile->Location = System::Drawing::Point(25, 242);
+			this->button_chooseFile->Location = System::Drawing::Point(25, 232);
 			this->button_chooseFile->Margin = System::Windows::Forms::Padding(4);
 			this->button_chooseFile->Name = L"button_chooseFile";
-			this->button_chooseFile->Size = System::Drawing::Size(200, 34);
+			this->button_chooseFile->Size = System::Drawing::Size(200, 44);
 			this->button_chooseFile->TabIndex = 22;
 			this->button_chooseFile->Text = L"Choose File";
 			this->button_chooseFile->UseVisualStyleBackColor = true;
@@ -191,18 +175,34 @@ namespace Form_Client {
 			this->textBox_Path->Size = System::Drawing::Size(187, 22);
 			this->textBox_Path->TabIndex = 25;
 			// 
+			// progressBar1
+			// 
+			this->progressBar1->Location = System::Drawing::Point(259, 254);
+			this->progressBar1->Name = L"progressBar1";
+			this->progressBar1->Size = System::Drawing::Size(287, 22);
+			this->progressBar1->TabIndex = 29;
+			// 
+			// label1
+			// 
+			this->label1->AutoSize = true;
+			this->label1->Location = System::Drawing::Point(259, 231);
+			this->label1->Name = L"label1";
+			this->label1->Size = System::Drawing::Size(59, 17);
+			this->label1->TabIndex = 30;
+			this->label1->Text = L"Process";
+			// 
 			// PrivateChatForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(573, 400);
+			this->Controls->Add(this->label1);
+			this->Controls->Add(this->progressBar1);
 			this->Controls->Add(this->textBox_fileName);
 			this->Controls->Add(this->label_fileName);
 			this->Controls->Add(this->label_Path);
 			this->Controls->Add(this->textBox_Path);
 			this->Controls->Add(this->button_chooseFile);
-			this->Controls->Add(this->textBox_status);
-			this->Controls->Add(this->label_status);
 			this->Controls->Add(this->button_sendMsg);
 			this->Controls->Add(this->label_chatBox);
 			this->Controls->Add(this->textBox_boxChat);
@@ -233,6 +233,9 @@ namespace Form_Client {
 	public: System::Void ThreadChooseFile();
 	private: System::Void button_chooseFile_Click(System::Object^ sender, System::EventArgs^ e);
 	public: String^ splitPathFileToReceiver(String^ pathFile);
+	public: void setUpProcessBar(int min, int max);
+	public: void resetProcessBar();
+	public: void setValueOfProcessBar(int value);
 
 };
 }

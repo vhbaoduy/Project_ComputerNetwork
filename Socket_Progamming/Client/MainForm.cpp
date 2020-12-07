@@ -7,7 +7,7 @@ System::Void Form_Client::MainForm::MainForm_Load(System::Object^ sender, System
 	this->label_userName->Text = CentralController::getObject()->userName;
 	CentralController::getObject()->createThreadListenMessageFromServer();
 	CentralController::getObject()->requestListOnlineUsers();
-	CentralController::getObject()->requestListOnlineUsers();
+	//CentralController::getObject()->requestListOnlineUsers();
 }
 
 void Form_Client::MainForm::addTextToBoxChat(String^ text) {
