@@ -8,8 +8,8 @@
 #include "PrivateChatForm.h"
 #include "ChangePasswordForm.h"
 
-#define DEFAULT_BUFFER_LENGTH 102912
-#define BUFFER_SIZE 102400
+#define DEFAULT_BUFFER_LENGTH 10752
+#define BUFFER_SIZE 10240
 
 ref class CentralController
 {

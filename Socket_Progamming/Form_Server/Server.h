@@ -4,7 +4,7 @@
 #include "MainForm.h"
 
 
-#define DEFAULT_BUFFER_LENGTH 102912 // buffer file + buffer others
+#define DEFAULT_BUFFER_LENGTH 10752 // buffer file + buffer others
 
 
 
