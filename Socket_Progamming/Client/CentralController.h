@@ -156,6 +156,7 @@ public:
 			switch (messageReceived->messageType) {
 			case StructClass::MessageType::LogIn:
 				MessageBox::Show("Login message?");
+				
 				break;
 			case StructClass::MessageType::ResponseLogin:
 			{
@@ -178,12 +179,13 @@ public:
 				else {
 					MessageBox::Show(responseLogIn->errorMessage);
 				}
-
+				
 				break;
 			}
 			case StructClass::MessageType::SignUp:
 			{
 				MessageBox::Show("Sign up received?");
+				
 				break;
 			}
 			case StructClass::MessageType::ResponseSignUp:
@@ -200,7 +202,7 @@ public:
 				else {
 					MessageBox::Show(responseSignUp->errorMessage);
 				}
-
+				
 				break;
 			}
 			case StructClass ::MessageType :: ChangePassword:
@@ -220,7 +222,7 @@ public:
 				else {
 					MessageBox::Show(resChangePw->errorMessage);
 				}
-		
+				
 				break;
 			}
 			case StructClass::MessageType::LogInNotification:
@@ -228,6 +230,7 @@ public:
 				LogInNotification^ logNoti = (LogInNotification^)messageReceived;
 				CentralController::getObject()->mainForm->addTextToBoxChat(logNoti->userName + " has just online!");
 				CentralController::getObject()->mainForm->addAnOnlineUser(logNoti->userName);
+				
 				break;
 				
 
@@ -237,6 +240,7 @@ public:
 				LogOutNotification^ logNoti = (LogOutNotification^)messageReceived;
 				CentralController::getObject()->mainForm->addTextToBoxChat(logNoti->userName+ " has just offline!");
 				CentralController::getObject()->mainForm->deleteAnOnline(logNoti->userName);
+				
 				break;
 			}
 
@@ -244,6 +248,7 @@ public:
 			{
 				UserStatusClass^ userStatus = (UserStatusClass^)messageReceived;
 				CentralController::getObject()->mainForm->setOnlineUsers(userStatus->listUser);
+				
 				break;
 			}
 
@@ -251,6 +256,7 @@ public:
 			{
 				PublicChat^ publicMessage = (PublicChat^)messageReceived;
 				CentralController::getObject()->mainForm->addTextToBoxChat(publicMessage->message);
+				
 				break;
 			}
 
@@ -258,6 +264,7 @@ public:
 			{
 				PrivateChat^ privateMessage = (PrivateChat^)messageReceived;
 				CentralController::getObject()->setPrivateMessage(privateMessage->userNameReceiver, privateMessage->message);
+		
 				break;
 			}
 
@@ -327,14 +334,15 @@ public:
 					MessageBox::Show(e->Message, "Error Client(Private File)");
 				}
 				break;
+				
 			}
 
 			default:
 				break;
 			}
 
-
-
+			delete[] buffer;
+			
 		}
 
 	}
@@ -366,11 +374,13 @@ public:
 	}
 	int sendPrivateFile(String^ _ToUsername, String^ _FileName, String^ _FilePath)
 	{
+		//CentralController::getObject()->createThreadListenMessageFromServer();
+		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
+		//setPrivateMessage(_ToUsername, "Sending...");
+		//setPrivateMessage(_ToUsername, "Sending...");
 		PrivateFile^ prvFile = gcnew PrivateFile;
 		prvFile->fileName = _FileName;
 		prvFile->userName = _ToUsername;
-		//setPrivateMessage(_ToUsername, "Sending...");
-		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
 		//Spit to smaller packages to send to server
 		array<Byte>^ buffer;
 
@@ -397,12 +407,13 @@ public:
 			int curPackageNumber = 1;
 			int iTotalPackage = sum / (BUFFER_SIZE + 1) + 1;
 			//Console::WriteLine("Start send file: ");
-			prvChatForm->setUpProcessBar(curPackageNumber, iTotalPackage);
 			
+
+			prvChatForm->setUpProcessBar(1, iTotalPackage);
 			for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
 			{
 				//System::Array::Copy(buffer, counter, bData, BUFF_SIZE);
-				
+
 				int copyLength = counter + BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
 				array<Byte>^ bData = gcnew array<Byte>(copyLength);
 				//MessageBox::Show(Convert::ToString(copyLength));
@@ -418,10 +429,11 @@ public:
 				array<Byte>^ byteData = prvFile->pack();
 				//MessageBox::Show(Convert::ToString(byteData->Length));
 				//if (byteData != nullptr)
-
 				setPrivateMessage(_ToUsername, "Sending...");
+			
+				//Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
 
-				appSocket->sendMessage(byteData);
+				CentralController::getObject()->appSocket->sendMessage(byteData);
 				//setPrivateFileProcess(_ToUsername,curPackageNumber);
 				prvChatForm->setValueOfProcessBar(curPackageNumber);
 				delete[] bData;
@@ -439,7 +451,7 @@ public:
 			if (fileStream != nullptr) {
 				fileStream->Close();
 				prvChatForm->resetProcessBar();
-				setPrivateMessage(_ToUsername, "Sent " + prvFile->fileName + "(" + Convert::ToString(prvChatForm->fileSizeToSend) + "bytes)  successfully !");
+				setPrivateMessage(_ToUsername, "Sent " + _FileName + "(" + Convert::ToString(prvChatForm->fileSizeToSend) + "bytes)  successfully !");
 			}
 		}
 

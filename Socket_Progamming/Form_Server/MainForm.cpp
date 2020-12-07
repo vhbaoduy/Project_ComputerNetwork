@@ -6,12 +6,13 @@
 System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
 	Server^ server = Server::getObject();
 
+
 	this->textBox_IP->Text = server->serverIpAddress;
 	this->textBox_Port->Text = Convert::ToString(server->serverPortAddress);
 	this->textBox_listClients->Text = nullptr;
 
 	this->updateConnectedClient(server->getListOfClient());
-	this->updateConnectedClient(server->getListOfClient());
+	//this->updateConnectedClient(server->getListOfClient());
 }
 
  System :: Void Form_Server::MainForm:: textBox_IP_TextChanged(System::Object^ sender, System::EventArgs^ e) {
@@ -42,8 +43,10 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 int receive = socket->Receive(buffer);
 			 //MessageBox::Show(Convert::ToString(buffer->Length));
 			 StructClass^ messageReceived = ProcessApp::unpack(buffer);
-			
-
+			 if (messageReceived == nullptr)
+				 MessageBox::Show("mess null");
+			 if (sizeof(messageReceived->messageType) != 4)
+				 MessageBox::Show("mess type");
 			 switch (messageReceived->messageType)
 			 {
 			 case StructClass::MessageType::LogIn:
@@ -140,14 +143,15 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 default:
 				 break;
 			 }
+			 delete[] buffer;
 		 }
 		 catch(Exception^ e){
-			 MessageBox::Show(e->Message,"Error server");
+			 MessageBox::Show(e->Message,"Error server " + Server::getObject()->getUserNameBySocket(socket));
 			 return;
 
 		 }
 
-
+		 
 	 }
 	
  }

@@ -1,6 +1,6 @@
 #pragma once
 #include "Struct.h"
-ref class PrivateFile:public StructClass
+ref class PrivateFile :public StructClass
 {
 public:
 
@@ -9,14 +9,14 @@ public:
 	int iPackageNumber;
 	int iTotalPackage;
 	array<Byte>^ bData;
-	bool isEncrypted;
+	//bool isEncrypted;
 	PrivateFile() {
 		userName = nullptr;
 		fileName = nullptr;
 		iPackageNumber = 0;
 		iTotalPackage = 0;
 		bData = nullptr;
-		isEncrypted = false;
+		//isEncrypted = false;
 	}
 	virtual array<Byte>^ pack() override {
 		List<Byte>^ byteData = gcnew List<Byte>();
@@ -50,7 +50,7 @@ public:
 		byteData->AddRange(bData);
 		//Return
 
-		byteData->AddRange(BitConverter::GetBytes(isEncrypted));
+		//byteData->AddRange(BitConverter::GetBytes(isEncrypted));
 		return byteData->ToArray();
 
 	}
@@ -82,10 +82,11 @@ public:
 		if (dataSize > 0)
 			System::Array::Copy(buff, offset, bData, 0, dataSize);
 
-		offset += dataSize;
-		isEncrypted = BitConverter::ToBoolean(buff, offset);
+		//offset += dataSize;
+		//isEncrypted = BitConverter::ToBoolean(buff, offset);
 		return this;
 
 	}
+
 };
 

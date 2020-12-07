@@ -59,7 +59,7 @@ public:
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "192.168.1.30";
+		this->serverIpAddress = "192.168.18.115";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}

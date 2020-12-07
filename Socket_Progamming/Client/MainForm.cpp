@@ -3,6 +3,8 @@
 #include "CentralController.h"
 
 System::Void Form_Client::MainForm::MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
+
+
 	this->Text = CentralController::getObject()->userName;
 	this->label_userName->Text = CentralController::getObject()->userName;
 	CentralController::getObject()->createThreadListenMessageFromServer();
