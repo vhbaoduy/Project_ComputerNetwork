@@ -4,7 +4,7 @@
 #include "MainForm.h"
 
 
-#define DEFAULT_BUFFER_LENGTH 10752 // buffer file + buffer others
+#define DEFAULT_BUFFER_LENGTH 102912 // buffer file + buffer others
 
 
 
@@ -59,7 +59,7 @@ public:
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "192.168.18.115";
+		this->serverIpAddress = "192.168.18.125";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}

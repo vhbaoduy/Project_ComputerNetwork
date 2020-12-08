@@ -8,8 +8,8 @@
 #include "PrivateChatForm.h"
 #include "ChangePasswordForm.h"
 
-#define DEFAULT_BUFFER_LENGTH 10752
-#define BUFFER_SIZE 10240
+#define DEFAULT_BUFFER_LENGTH 102912
+#define BUFFER_SIZE 102400
 
 ref class CentralController
 {
@@ -374,7 +374,7 @@ public:
 	}
 	int sendPrivateFile(String^ _ToUsername, String^ _FileName, String^ _FilePath)
 	{
-		//CentralController::getObject()->createThreadListenMessageFromServer();
+		CentralController::getObject()->createThreadListenMessageFromServer();
 		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
 		//setPrivateMessage(_ToUsername, "Sending...");
 		//setPrivateMessage(_ToUsername, "Sending...");
@@ -414,16 +414,24 @@ public:
 			{
 				//System::Array::Copy(buffer, counter, bData, BUFF_SIZE);
 
-				int copyLength = counter + BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
-				array<Byte>^ bData = gcnew array<Byte>(copyLength);
-				//MessageBox::Show(Convert::ToString(copyLength));
-				System::Array::Copy(buffer, counter, bData, 0, copyLength);
-				counter += BUFFER_SIZE;
+				int copyLength = BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
+				sum -= copyLength;
+				//array<Byte>^ bData = gcnew array<Byte>(copyLength);
+				//System::Array::Copy(buffer, counter, bData, 0, copyLength);
+				prvFile->bData = gcnew array<Byte>(copyLength);
+				//if (counter + copyLength < length - copyLength) {
+					System::Array::Copy(buffer, counter, prvFile->bData, 0, copyLength);
+					counter += copyLength;
+				//}
+				//else {
+				//	System::Array::Copy(buffer, counter, prvFile->bData, 0, length-counter);
+				//	counter += length - counter;
+				//}
 				//MessageBox::Show(Convert::ToString(bData->Length));
 
 				prvFile->iPackageNumber = curPackageNumber;
 				prvFile->iTotalPackage = iTotalPackage;
-				prvFile->bData = bData;
+				//prvFile->bData = bData;
 				//MessageBox::Show(Convert::ToString(prvFile->iPackageNumber) + " "+ Convert::ToString(prvFile->iTotalPackage));
 				//writeStream->Write(bData, 0, copyLength);
 				array<Byte>^ byteData = prvFile->pack();
@@ -436,7 +444,7 @@ public:
 				CentralController::getObject()->appSocket->sendMessage(byteData);
 				//setPrivateFileProcess(_ToUsername,curPackageNumber);
 				prvChatForm->setValueOfProcessBar(curPackageNumber);
-				delete[] bData;
+				delete[] prvFile->bData;
 			}
 			//Console::WriteLine("End of sending file");
 			//CentralController::getObject()->appSocket->clientSocket->SendFile()
