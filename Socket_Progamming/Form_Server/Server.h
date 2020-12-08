@@ -39,7 +39,8 @@ public:
 	int serverPortAddress;
 
 
-	String^ accountPath = "Account\\accounts.txt";
+	String^ accountPath = "Database\\accounts.txt";
+	String^ inforPath = "Database\\infor.txt";
 
 	// Form
 	Form_Server::MainForm^ mainScreen;
@@ -191,6 +192,7 @@ public:
 	bool addAccount(String^ user, String^ pw) {
 		try {
 			System::IO::File::AppendAllText(this->accountPath,user + "," + pw + "\n");
+			System::IO::File::AppendAllText(inforPath, user + "," + "\n");
 		}
 		catch (Exception^ e) {
 			return false;
@@ -433,22 +435,43 @@ public:
 		receiver->Send(byteData);
 	}
 
-	//void sendPrivateFilePackage(String^ _ToUsername, String^ _Filename, int _iPackageNumber, array<Byte>^ _bData, Socket^ _ClientSocket)
-	//{
-	//	String^ sender = getUserNameBySocket(_ClientSocket);
-	//	PrivateFile^ prvFile = gcnew PrivateFile();
-	//	prvFile->userName = sender;
-	//	prvFile->fileName = _Filename;
-	//	prvFile->bData = _bData;
-	//	//System::Array::Copy(_bData, 0, prvFile->bData, 0, _bData->Length);
-	//	prvFile->iPackageNumber = _iPackageNumber;
-	//	//prvFile->iTotalPackage = _TotalPackage;
+	void setInfor(String^ userName, String^ birthDate)
+	{
+		array<String^>^ lines = System::IO::File::ReadAllLines(inforPath);
+		for (int i = 0; i < lines->Length; i++)
+		{
+			if (lines[i]->Contains(userName + ","))
+				//if (lines[i] == userName + "|")
+			{
+				//MessageBox::Show("Hello guy");
+				lines[i] = userName + "," + birthDate;
+				break;
+			}
+		}
+		System::IO::File::WriteAllLines(inforPath, lines);
+	}
+	void responseInfor(String^ _friendUsername, Socket^ _ClientSocket)
+	{
+		array<String^>^ lines = System::IO::File::ReadAllLines(inforPath);
+		String^ BirthDate;
+		for (int i = 0; i < lines->Length; i++)
+		{
+			if (lines[i]->Contains(_friendUsername + ","))
+			{
+				//MessageBox::Show("Hello guy");
+				BirthDate = lines[i]->Remove(0, _friendUsername->Length + 1);
+				break;
+			}
+		}
+		//System::IO::File::WriteAllLines(inforPath, lines);
+		ResponseInforClass^ resInfor = gcnew ResponseInforClass();
+		resInfor->friendUsername = _friendUsername;
+		resInfor->birthDate = BirthDate;
 
-	//	array<Byte>^ byteData = prvFile->pack();
-	//	Socket^ receiver = getSocketByUserName(_ToUsername);
-	//	receiver->Send(byteData);
-	//}
-
+		//Socket^ receiver = getSocketByUsername(_ToUsername);
+		array<Byte>^ buff = resInfor->pack();
+		_ClientSocket->Send(buff);
+	}
 
 
 	// others

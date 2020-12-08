@@ -44,7 +44,8 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 //MessageBox::Show(Convert::ToString(buffer->Length));
 			 StructClass^ messageReceived = ProcessApp::unpack(buffer);
 			 if (messageReceived == nullptr)
-				 MessageBox::Show("mess null");
+				 //MessageBox::Show("mess null");
+				 continue;
 			 if (sizeof(messageReceived->messageType) != 4)
 				 MessageBox::Show("mess type");
 			 switch (messageReceived->messageType)
@@ -83,6 +84,13 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 				 Server::getObject()->changePassword(changePw->userName, changePw->oldPassword, changePw->newPassword, changePw->confirmPassword, socket);
 				 break;
 			 }
+
+			 case StructClass::MessageType::SetInfor:
+			 {
+				 SetInforClass^ setInforStruct = (SetInforClass^)messageReceived;
+				 Server::getObject()->setInfor(setInforStruct->userName, setInforStruct->birthDate);
+				 break;
+			 }
 			 case StructClass::MessageType::LogOutNotification:
 			 {
 				 LogOutNotification^ logOut = (LogOutNotification^)messageReceived;
@@ -117,6 +125,13 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 				 Server::getObject()->requestSendFile(rqSendFileStruct->userName, rqSendFileStruct->fileName, rqSendFileStruct->iFileSize, socket);
 				 break;
 			 }
+
+			 case StructClass::MessageType::RequestInfor:
+			 {
+				 RequestInforClass^ rpSendFileStruct = (RequestInforClass^)messageReceived;
+				 Server::getObject()->responseInfor(rpSendFileStruct->friendUsername, socket);
+				 break;
+			 }
 			 case StructClass::MessageType::ResponseSendFile:
 			 {
 				 ResponseSendFile^ rpSendFileStruct = (ResponseSendFile^)messageReceived;
@@ -127,15 +142,15 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 
 			 case StructClass::MessageType::PrivateFile:
 			 {
-				 try {
+				 //try {
 					 PrivateFile^ prvFile = (PrivateFile^)messageReceived;
 					 //MessageBox::Show("debug private file");
 					 Server::getObject()->sendPrivateFilePackage(prvFile->userName, prvFile->fileName, prvFile->iPackageNumber, prvFile->iTotalPackage, prvFile->bData, socket);
 
-				 }
-				 catch (Exception^e) {
-					 MessageBox::Show(e->Message, "Error Server(Private File)");
-				 }
+				// }
+				 //catch (Exception^e) {
+					// MessageBox::Show(e->Message, "Error Server(Private File)");
+				 //}
 
 				 break;
 			 }
@@ -145,8 +160,8 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 }
 			 delete[] buffer;
 		 }
-		 catch(Exception^ e){
-			 MessageBox::Show(e->Message,"Error server " + Server::getObject()->getUserNameBySocket(socket));
+		 catch (Exception^ e) {
+			 MessageBox::Show(e->Message, "Error server " + Server::getObject()->getUserNameBySocket(socket));
 			 return;
 
 		 }

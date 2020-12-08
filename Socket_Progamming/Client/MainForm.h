@@ -48,11 +48,14 @@ namespace Form_Client {
 
 	private: System::Windows::Forms::Label^ label_online;
 
-	private: System::Windows::Forms::Label^ label_info;
+
 
 		   //private: System::Windows::Forms::Label^ label2;
-	private: System::Windows::Forms::Label^ label_userName;
+
 	private: System::Windows::Forms::ListBox^ listBox_activeUser;
+
+	private: System::Windows::Forms::Button^ butSetInfor;
+	private: System::Windows::Forms::Button^ button_myInfor;
 
 
 	private:
@@ -75,9 +78,9 @@ namespace Form_Client {
 			this->button_changePassword = (gcnew System::Windows::Forms::Button());
 			this->button_logOut = (gcnew System::Windows::Forms::Button());
 			this->label_online = (gcnew System::Windows::Forms::Label());
-			this->label_info = (gcnew System::Windows::Forms::Label());
-			this->label_userName = (gcnew System::Windows::Forms::Label());
 			this->listBox_activeUser = (gcnew System::Windows::Forms::ListBox());
+			this->butSetInfor = (gcnew System::Windows::Forms::Button());
+			this->button_myInfor = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// textBox_inputMessage
@@ -120,7 +123,7 @@ namespace Form_Client {
 			// 
 			// button_changePassword
 			// 
-			this->button_changePassword->Location = System::Drawing::Point(520, 322);
+			this->button_changePassword->Location = System::Drawing::Point(520, 329);
 			this->button_changePassword->Name = L"button_changePassword";
 			this->button_changePassword->Size = System::Drawing::Size(139, 34);
 			this->button_changePassword->TabIndex = 4;
@@ -130,7 +133,7 @@ namespace Form_Client {
 			// 
 			// button_logOut
 			// 
-			this->button_logOut->Location = System::Drawing::Point(520, 372);
+			this->button_logOut->Location = System::Drawing::Point(520, 379);
 			this->button_logOut->Name = L"button_logOut";
 			this->button_logOut->Size = System::Drawing::Size(139, 34);
 			this->button_logOut->TabIndex = 5;
@@ -147,24 +150,6 @@ namespace Form_Client {
 			this->label_online->TabIndex = 7;
 			this->label_online->Text = L"Online";
 			// 
-			// label_info
-			// 
-			this->label_info->AutoSize = true;
-			this->label_info->Location = System::Drawing::Point(520, 277);
-			this->label_info->Name = L"label_info";
-			this->label_info->Size = System::Drawing::Size(35, 17);
-			this->label_info->TabIndex = 9;
-			this->label_info->Text = L"Info:";
-			// 
-			// label_userName
-			// 
-			this->label_userName->AutoSize = true;
-			this->label_userName->Location = System::Drawing::Point(581, 277);
-			this->label_userName->Name = L"label_userName";
-			this->label_userName->Size = System::Drawing::Size(71, 17);
-			this->label_userName->TabIndex = 11;
-			this->label_userName->Text = L"username";
-			// 
 			// listBox_activeUser
 			// 
 			this->listBox_activeUser->FormattingEnabled = true;
@@ -176,15 +161,37 @@ namespace Form_Client {
 			this->listBox_activeUser->TabIndex = 12;
 			this->listBox_activeUser->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::listBox_activeUser_OnMouseDoubleClick);
 			// 
+			// butSetInfor
+			// 
+			this->butSetInfor->Location = System::Drawing::Point(520, 275);
+			this->butSetInfor->Margin = System::Windows::Forms::Padding(4);
+			this->butSetInfor->Name = L"butSetInfor";
+			this->butSetInfor->Size = System::Drawing::Size(143, 33);
+			this->butSetInfor->TabIndex = 24;
+			this->butSetInfor->Text = L"Set Information";
+			this->butSetInfor->UseVisualStyleBackColor = true;
+			this->butSetInfor->Click += gcnew System::EventHandler(this, &MainForm::butSetInfor_Click);
+			// 
+			// button_myInfor
+			// 
+			this->button_myInfor->Location = System::Drawing::Point(516, 220);
+			this->button_myInfor->Margin = System::Windows::Forms::Padding(4);
+			this->button_myInfor->Name = L"button_myInfor";
+			this->button_myInfor->Size = System::Drawing::Size(143, 38);
+			this->button_myInfor->TabIndex = 25;
+			this->button_myInfor->Text = L"View My Infor";
+			this->button_myInfor->UseVisualStyleBackColor = true;
+			this->button_myInfor->Click += gcnew System::EventHandler(this, &MainForm::button_myInfor_Click);
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::SystemColors::Control;
 			this->ClientSize = System::Drawing::Size(718, 434);
+			this->Controls->Add(this->button_myInfor);
+			this->Controls->Add(this->butSetInfor);
 			this->Controls->Add(this->listBox_activeUser);
-			this->Controls->Add(this->label_userName);
-			this->Controls->Add(this->label_info);
 			this->Controls->Add(this->label_online);
 			this->Controls->Add(this->button_logOut);
 			this->Controls->Add(this->button_changePassword);
@@ -214,6 +221,8 @@ namespace Form_Client {
 
 	private: System::Void listBox_activeUser_OnMouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e);
 	private: System::Void button_changePassword_Click(System::Object^ sender, System::EventArgs^ e);
+	private: System::Void butSetInfor_Click(System::Object^ sender, System::EventArgs^ e);
+	private: System::Void button_myInfor_Click(System::Object^ sender, System::EventArgs^ e);
 };
 }
 

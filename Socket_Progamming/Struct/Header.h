@@ -14,6 +14,9 @@
 #include "PrivateFile.h"
 #include "ChangePasswordClass.h"
 #include "ResponseChangePassword.h"
+#include "SetInforClass.h"
+#include "RequestInforClass.h"
+#include "ResponseInforClass.h"
 
 
 
@@ -117,6 +120,29 @@ public:
 			{
 				result = gcnew PrivateFile();
 				result->messageType = StructClass::MessageType::PrivateFile;
+				result->unpack(buffer);
+				break;
+			}
+
+			case StructClass::MessageType::SetInfor:
+			{
+				result = gcnew SetInforClass();
+				result->messageType = StructClass::MessageType::SetInfor;
+				result->unpack(buffer);
+				break;
+			}
+			case StructClass::MessageType::ResponseInfor:
+			{
+				result = gcnew ResponseInforClass();
+				result->messageType = StructClass::MessageType::ResponseInfor;
+				result->unpack(buffer);
+				break;
+
+			}
+			case StructClass::MessageType::RequestInfor:
+			{
+				result = gcnew RequestInforClass();
+				result->messageType = StructClass::MessageType::RequestInfor;
 				result->unpack(buffer);
 				break;
 			}

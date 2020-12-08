@@ -154,12 +154,14 @@
     <ClInclude Include="Header.h" />
     <ClInclude Include="LogInNotification.h" />
     <ClInclude Include="LogOutNotification.h" />
+    <ClInclude Include="RequestInforClass.h" />
     <ClInclude Include="RequestSendFile.h" />
     <ClInclude Include="ResponseChangePassword.h" />
+    <ClInclude Include="ResponseInforClass.h" />
     <ClInclude Include="ResponseLogIn.h" />
     <ClInclude Include="ResponseSendFile.h" />
     <ClInclude Include="ResponseSignUp.h" />
-    <ClInclude Include="SecurityFunction.h" />
+    <ClInclude Include="SetInforClass.h" />
     <ClInclude Include="SignUpClass.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="LogInClass.h" />
@@ -167,7 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SecurityFunction.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

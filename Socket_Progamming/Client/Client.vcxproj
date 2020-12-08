@@ -162,8 +162,10 @@
     <ClInclude Include="PrivateChatForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="PrivateChatInfo.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SetInforForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -179,6 +181,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PrivateChatForm.cpp" />
+    <ClCompile Include="SetInforForm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="app.ico" />
@@ -206,6 +209,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PrivateChatForm.resx">
       <DependentUpon>PrivateChatForm.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetInforForm.resx">
+      <DependentUpon>SetInforForm.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

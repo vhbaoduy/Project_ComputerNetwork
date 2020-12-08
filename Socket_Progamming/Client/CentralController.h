@@ -7,6 +7,7 @@
 #include "MainForm.h"
 #include "PrivateChatForm.h"
 #include "ChangePasswordForm.h"
+#include "SetInforForm.h"
 
 #define DEFAULT_BUFFER_LENGTH 102912
 #define BUFFER_SIZE 102400
@@ -44,6 +45,7 @@ public:
 	Form_Client::LogIn^ logInScreen = nullptr; // login form
 	Form_Client::MainForm^ mainForm = nullptr;
 	Form_Client::ChangePasswordForm^ changePasswordForm = nullptr;
+	Form_Client::SetInforForm^ setInforForm = nullptr;
 	
 	Thread^ threadListenClient;
 	String^ userName = nullptr;
@@ -153,6 +155,10 @@ public:
 
 			StructClass^ messageReceived = ProcessApp::unpack(buffer);
 			//MessageBox::Show(Convert::ToString(messageReceived->messageType));
+			if (messageReceived == nullptr) {
+				//MessageBox::Show("Mess null client");
+				continue;
+			}
 			switch (messageReceived->messageType) {
 			case StructClass::MessageType::LogIn:
 				MessageBox::Show("Login message?");
@@ -284,6 +290,12 @@ public:
 				break;
 
 			}
+			case StructClass::MessageType::ResponseInfor:
+			{
+				ResponseInforClass^ resInfor = (ResponseInforClass^)messageReceived;
+				MessageBox::Show("Name: " + resInfor->friendUsername + "\nBirthdate: " + resInfor->birthDate, "Information");
+				break;
+			}
 			case StructClass::MessageType::ResponseSendFile:
 			{
 				ResponseSendFile^ rpSendFile = (ResponseSendFile^)messageReceived;
@@ -306,35 +318,34 @@ public:
 
 			case StructClass::MessageType::PrivateFile:
 			{
-				try {
-					PrivateFile^ prvFile = (PrivateFile^)messageReceived;
-					setPrivateMessage(prvFile->userName, "Receiving...");
-					Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
-					//else
-						//setPrivateMessage(prvFile->userName, nullptr);
-					if (prvFile->iPackageNumber == 1) {
-						CentralController::getObject()->createThreadListenMessageFromServer();
-						prvChatForm->setUpProcessBar(1, prvFile->iTotalPackage);
-						prvChatForm->writerStream = gcnew System::IO::FileStream(prvChatForm->pathFileToReceiver + prvFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
-					
-					}
-					//prvChatForm->fileSizeToSend += prvFile->bData->Length;
-					prvChatForm->writerStream->Write(prvFile->bData, 0, prvFile->bData->Length);
-					prvChatForm->setValueOfProcessBar(prvFile->iPackageNumber);
+				PrivateFile^ prvFile = (PrivateFile^)messageReceived;
+				setPrivateMessage(prvFile->userName, "Receiving...");
+				Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
+				//else
+					//setPrivateMessage(prvFile->userName, nullptr);
+				if (prvFile->iPackageNumber == 1) {
+					CentralController::getObject()->createThreadListenMessageFromServer();
+					prvChatForm->setUpProcessBar(1, prvFile->iTotalPackage);
+					prvChatForm->writerStream = gcnew System::IO::FileStream(prvChatForm->pathFileToReceiver + prvFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
 
-					if (prvFile->iPackageNumber == prvFile->iTotalPackage) {
-						setPrivateMessage(prvFile->userName, "Received " + prvFile->fileName + "(" + Convert::ToString((int)prvChatForm->writerStream->Length) + "bytes)  successfully !");
-						prvChatForm->resetProcessBar();
-						prvChatForm->writerStream->Close();
-						prvChatForm->writerStream = nullptr;
-					}
-					
 				}
-				catch (Exception^ e) {
-					MessageBox::Show(e->Message, "Error Client(Private File)");
+				//prvChatForm->fileSizeToSend += prvFile->bData->Length;
+				prvChatForm->writerStream->Write(prvFile->bData, 0, prvFile->bData->Length);
+				prvChatForm->setValueOfProcessBar(prvFile->iPackageNumber);
+
+				if (prvFile->iPackageNumber == prvFile->iTotalPackage) {
+					setPrivateMessage(prvFile->userName, "Received " + prvFile->fileName + "(" + Convert::ToString((int)prvChatForm->writerStream->Length) + "bytes)  successfully !");
+					prvChatForm->resetProcessBar();
+					prvChatForm->writerStream->Close();
+					prvChatForm->writerStream = nullptr;
 				}
+
+				/*	}
+					catch (Exception^ e) {
+						MessageBox::Show(e->Message, "Error Client(Private File)");
+					}*/
 				break;
-				
+
 			}
 
 			default:
@@ -392,62 +403,61 @@ public:
 			//writeSteam = gcnew FileStream("Debug/" + _FilePath, FileMode::Create, FileAccess::Write);
 
 			int length = (int)fileStream->Length;  // get file length
-			buffer = gcnew array<Byte>(length);            // create buffer
+           // create buffer
 			int count;                            // actual number of bytes read
 			int sum = 0;                          // total number of bytes read
 			//int SIZE = 512;
 			// read until Read method returns 0 (end of the stream has been reached)
+			/*int curPackageNumber = 1;
+			int iTotalPackage = length / (BUFFER_SIZE + 1) + 1;
+			prvChatForm->setUpProcessBar(1, iTotalPackage);
+			while (1) {
+				buffer = gcnew array<Byte>(BUFFER_SIZE);
+				count = fileStream->Read(buffer, 0, BUFFER_SIZE);
+				if (count == 0)
+					break;
+				else {
+					prvFile->bData = gcnew array<Byte>(count);
+					System::Array::Copy(buffer, 0, prvFile->bData, 0, count);
+					prvFile->iPackageNumber = curPackageNumber;
+					prvFile->iTotalPackage = iTotalPackage;
+					array<Byte>^ byteData = prvFile->pack();
+					setPrivateMessage(_ToUsername, "Sending...");
+					CentralController::getObject()->appSocket->sendMessage(byteData);
+					prvChatForm->setValueOfProcessBar(curPackageNumber++);
+					delete[] prvFile->bData;
+				}
+
+
+
+				delete[] buffer;
+			}*/
+			buffer = gcnew array<Byte>(length);
 			while ((count = fileStream->Read(buffer,sum,length-sum)) >0)
 			{
 				sum += count;
 			}
-
-			//int BUFF_SIZE = 102400;
 			int counter = 0;
 			int curPackageNumber = 1;
 			int iTotalPackage = sum / (BUFFER_SIZE + 1) + 1;
-			//Console::WriteLine("Start send file: ");
-			
-
 			prvChatForm->setUpProcessBar(1, iTotalPackage);
 			for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
 			{
-				//System::Array::Copy(buffer, counter, bData, BUFF_SIZE);
 
 				int copyLength = BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
 				sum -= copyLength;
-				//array<Byte>^ bData = gcnew array<Byte>(copyLength);
-				//System::Array::Copy(buffer, counter, bData, 0, copyLength);
 				prvFile->bData = gcnew array<Byte>(copyLength);
-				//if (counter + copyLength < length - copyLength) {
-					System::Array::Copy(buffer, counter, prvFile->bData, 0, copyLength);
-					counter += copyLength;
-				//}
-				//else {
-				//	System::Array::Copy(buffer, counter, prvFile->bData, 0, length-counter);
-				//	counter += length - counter;
-				//}
-				//MessageBox::Show(Convert::ToString(bData->Length));
+				System::Array::Copy(buffer, counter, prvFile->bData, 0, copyLength);
+				counter += copyLength;
 
 				prvFile->iPackageNumber = curPackageNumber;
 				prvFile->iTotalPackage = iTotalPackage;
-				//prvFile->bData = bData;
-				//MessageBox::Show(Convert::ToString(prvFile->iPackageNumber) + " "+ Convert::ToString(prvFile->iTotalPackage));
-				//writeStream->Write(bData, 0, copyLength);
 				array<Byte>^ byteData = prvFile->pack();
-				//MessageBox::Show(Convert::ToString(byteData->Length));
-				//if (byteData != nullptr)
 				setPrivateMessage(_ToUsername, "Sending...");
-			
-				//Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
-
 				CentralController::getObject()->appSocket->sendMessage(byteData);
-				//setPrivateFileProcess(_ToUsername,curPackageNumber);
 				prvChatForm->setValueOfProcessBar(curPackageNumber);
 				delete[] prvFile->bData;
 			}
-			//Console::WriteLine("End of sending file");
-			//CentralController::getObject()->appSocket->clientSocket->SendFile()
 			
 		}
 		catch (Exception^ e)
@@ -541,6 +551,26 @@ public:
 			//threadListenClient->Start(pChat);
 		}
 
+		return 0;
+	}
+
+	int setInfor(String^ _Username, String^ _Birthdate)
+	{
+		SetInforClass^ setInfor = gcnew SetInforClass();
+		setInfor->userName = _Username;
+		setInfor->birthDate = _Birthdate;
+
+		array<Byte>^ byteData = setInfor->pack();
+		appSocket->sendMessage(byteData);
+		return 0;
+	}
+
+	int requestInfor(String^ _friendUsername)
+	{
+		RequestInforClass^ inforFriend = gcnew RequestInforClass();
+		inforFriend->friendUsername = _friendUsername;
+		array<Byte>^ byteData = inforFriend->pack();
+		appSocket->sendMessage(byteData);
 		return 0;
 	}
 	//Others

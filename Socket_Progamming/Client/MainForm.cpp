@@ -6,7 +6,7 @@ System::Void Form_Client::MainForm::MainForm_Load(System::Object^ sender, System
 
 
 	this->Text = CentralController::getObject()->userName;
-	this->label_userName->Text = CentralController::getObject()->userName;
+	//this->label_userName->Text = CentralController::getObject()->userName;
 	CentralController::getObject()->createThreadListenMessageFromServer();
 	CentralController::getObject()->requestListOnlineUsers();
 	//CentralController::getObject()->requestListOnlineUsers();
@@ -86,5 +86,12 @@ System::Void Form_Client::MainForm::MainForm_FormClosed(System::Object^ sender, 
 
 }
 
+System::Void  Form_Client::MainForm::butSetInfor_Click(System::Object^ sender, System::EventArgs^ e) {
+	CentralController::getObject()->setInforForm = gcnew Form_Client::SetInforForm();
+	CentralController::getObject()->setInforForm->Show();
+}
 
+System::Void Form_Client::MainForm::button_myInfor_Click(System::Object^ sender, System::EventArgs^ e) {
+	CentralController::getObject()->requestInfor(CentralController::getObject()->userName);
+}
 

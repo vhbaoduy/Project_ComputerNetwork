@@ -31,8 +31,8 @@ System::Void Form_Client::PrivateChatForm:: ThreadChooseFile() {
 	{
 		String^ _info = ofd->SafeFileName;
 		String^ info = ofd->FileName;
-		this->textBox_fileName->Text = _info;
-		this->textBox_Path->Text = info;
+		//this->textBox_fileName->Text = _info;
+		//this->textBox_Path->Text = info;
 		int size = IO::FileInfo(ofd->FileName).Length;
 
 		fileNameToSend = _info;
@@ -60,15 +60,19 @@ String^ Form_Client::PrivateChatForm::splitPathFileToReceiver(String^ pathFile) 
 	return pathFile;
 }
 
-	void Form_Client::PrivateChatForm::setUpProcessBar(int min, int max) {
+void Form_Client::PrivateChatForm::setUpProcessBar(int min, int max) {
 		this->progressBar1->Minimum = min;
 		this->progressBar1->Maximum = max;
-	}
-	void Form_Client::PrivateChatForm::resetProcessBar() {
+}
+void Form_Client::PrivateChatForm::resetProcessBar() {
 		this->progressBar1->Minimum = 0;
 		this->progressBar1->Maximum = 0;
 		this->progressBar1->Value = 0;
-	}
-	void Form_Client::PrivateChatForm::setValueOfProcessBar(int value) {
+}
+void Form_Client::PrivateChatForm::setValueOfProcessBar(int value) {
 		this->progressBar1->Value = value;
-	}
+}
+
+System::Void  Form_Client::PrivateChatForm::button_viewInfor_Click(System::Object^ sender, System::EventArgs^ e) {
+	CentralController::getObject()->requestInfor(strFriendUsername);
+}

@@ -47,10 +47,10 @@
     <ClInclude Include="PrivateChatForm.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="PrivateChatInfo.h">
+    <ClInclude Include="ChangePasswordForm.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="ChangePasswordForm.h">
+    <ClInclude Include="SetInforForm.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,6 +77,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="ChangePasswordForm.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="SetInforForm.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
