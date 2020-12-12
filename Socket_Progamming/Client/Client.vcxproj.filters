@@ -53,6 +53,9 @@
     <ClInclude Include="SetInforForm.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="PublicFileForm.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -80,6 +83,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="SetInforForm.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PublicFileForm.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

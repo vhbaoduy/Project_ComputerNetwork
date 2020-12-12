@@ -72,6 +72,18 @@
     <ClInclude Include="ResponseInforClass.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="UploadPublicFileClass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ListPublicFileNameClass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="DownloadPublicFileClass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestSendPublicFileClass.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

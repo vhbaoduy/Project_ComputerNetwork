@@ -56,6 +56,7 @@ namespace Form_Client {
 
 	private: System::Windows::Forms::Button^ butSetInfor;
 	private: System::Windows::Forms::Button^ button_myInfor;
+	private: System::Windows::Forms::Button^ button_publicFile;
 
 
 	private:
@@ -81,11 +82,12 @@ namespace Form_Client {
 			this->listBox_activeUser = (gcnew System::Windows::Forms::ListBox());
 			this->butSetInfor = (gcnew System::Windows::Forms::Button());
 			this->button_myInfor = (gcnew System::Windows::Forms::Button());
+			this->button_publicFile = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// textBox_inputMessage
 			// 
-			this->textBox_inputMessage->Location = System::Drawing::Point(12, 341);
+			this->textBox_inputMessage->Location = System::Drawing::Point(12, 380);
 			this->textBox_inputMessage->Multiline = true;
 			this->textBox_inputMessage->Name = L"textBox_inputMessage";
 			this->textBox_inputMessage->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
@@ -113,7 +115,7 @@ namespace Form_Client {
 			// 
 			// button_sendMsg
 			// 
-			this->button_sendMsg->Location = System::Drawing::Point(373, 348);
+			this->button_sendMsg->Location = System::Drawing::Point(373, 387);
 			this->button_sendMsg->Name = L"button_sendMsg";
 			this->button_sendMsg->Size = System::Drawing::Size(75, 53);
 			this->button_sendMsg->TabIndex = 3;
@@ -123,7 +125,7 @@ namespace Form_Client {
 			// 
 			// button_changePassword
 			// 
-			this->button_changePassword->Location = System::Drawing::Point(520, 329);
+			this->button_changePassword->Location = System::Drawing::Point(524, 344);
 			this->button_changePassword->Name = L"button_changePassword";
 			this->button_changePassword->Size = System::Drawing::Size(139, 34);
 			this->button_changePassword->TabIndex = 4;
@@ -133,7 +135,7 @@ namespace Form_Client {
 			// 
 			// button_logOut
 			// 
-			this->button_logOut->Location = System::Drawing::Point(520, 379);
+			this->button_logOut->Location = System::Drawing::Point(524, 394);
 			this->button_logOut->Name = L"button_logOut";
 			this->button_logOut->Size = System::Drawing::Size(139, 34);
 			this->button_logOut->TabIndex = 5;
@@ -163,7 +165,7 @@ namespace Form_Client {
 			// 
 			// butSetInfor
 			// 
-			this->butSetInfor->Location = System::Drawing::Point(520, 275);
+			this->butSetInfor->Location = System::Drawing::Point(524, 290);
 			this->butSetInfor->Margin = System::Windows::Forms::Padding(4);
 			this->butSetInfor->Name = L"butSetInfor";
 			this->butSetInfor->Size = System::Drawing::Size(143, 33);
@@ -174,7 +176,7 @@ namespace Form_Client {
 			// 
 			// button_myInfor
 			// 
-			this->button_myInfor->Location = System::Drawing::Point(516, 220);
+			this->button_myInfor->Location = System::Drawing::Point(520, 235);
 			this->button_myInfor->Margin = System::Windows::Forms::Padding(4);
 			this->button_myInfor->Name = L"button_myInfor";
 			this->button_myInfor->Size = System::Drawing::Size(143, 38);
@@ -183,12 +185,23 @@ namespace Form_Client {
 			this->button_myInfor->UseVisualStyleBackColor = true;
 			this->button_myInfor->Click += gcnew System::EventHandler(this, &MainForm::button_myInfor_Click);
 			// 
+			// button_publicFile
+			// 
+			this->button_publicFile->Location = System::Drawing::Point(12, 333);
+			this->button_publicFile->Name = L"button_publicFile";
+			this->button_publicFile->Size = System::Drawing::Size(216, 39);
+			this->button_publicFile->TabIndex = 26;
+			this->button_publicFile->Text = L"Upload/Download File";
+			this->button_publicFile->UseVisualStyleBackColor = true;
+			this->button_publicFile->Click += gcnew System::EventHandler(this, &MainForm::button_publicFile_Click);
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::SystemColors::Control;
-			this->ClientSize = System::Drawing::Size(718, 434);
+			this->ClientSize = System::Drawing::Size(706, 477);
+			this->Controls->Add(this->button_publicFile);
 			this->Controls->Add(this->button_myInfor);
 			this->Controls->Add(this->butSetInfor);
 			this->Controls->Add(this->listBox_activeUser);
@@ -223,6 +236,7 @@ namespace Form_Client {
 	private: System::Void button_changePassword_Click(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void butSetInfor_Click(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void button_myInfor_Click(System::Object^ sender, System::EventArgs^ e);
+	private: System::Void button_publicFile_Click(System::Object^ sender, System::EventArgs^ e);
 };
 }
 

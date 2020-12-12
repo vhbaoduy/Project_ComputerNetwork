@@ -4,8 +4,8 @@
 #include "MainForm.h"
 
 
-#define DEFAULT_BUFFER_LENGTH 102912 // buffer file + buffer others
-
+#define DEFAULT_BUFFER_LENGTH 2560 // buffer file + buffer others
+#define BUFFER_SIZE 2048
 
 
 //ref class Client {
@@ -42,6 +42,12 @@ public:
 	String^ accountPath = "Database\\accounts.txt";
 	String^ inforPath = "Database\\infor.txt";
 
+	// public file
+	FileStream^ fileStream = nullptr;
+	int fileSize = 0;
+	String^ fileNamePath = "Database\\fileNames.txt";
+	String^ filePath = "File\\";
+
 	// Form
 	Form_Server::MainForm^ mainScreen;
 
@@ -60,7 +66,7 @@ public:
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "192.168.18.125";
+		this->serverIpAddress = "192.168.18.111";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}
@@ -516,8 +522,75 @@ public:
 		}
 	}
 	
+	// file
+	void sendPublicFile(String^ fileName,Socket^ clientSocket) {
+		array<Byte>^ buffer = System::IO::File::ReadAllBytes(filePath + fileName);
+		DownloadPublicFileClass^ pubFile = gcnew DownloadPublicFileClass();
+		pubFile->fileName = fileName;
+		pubFile->iFileSize = buffer->Length;
+		int check = 0;
+		int sum = buffer->Length;
+		int counter = 0;
+		int curPackageNumber = 1;
+		int iTotalPackage = sum / (BUFFER_SIZE + 1) + 1;
+		//prvChatForm->setUpProcessBar(1, iTotalPackage);
+		for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
+		{
+
+			int copyLength = BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
+			sum -= copyLength;
+			pubFile->bData = gcnew array<Byte>(copyLength);
+			System::Array::Copy(buffer, counter, pubFile->bData, 0, copyLength);
+			counter += copyLength;
+			check += pubFile->bData->Length;
+			pubFile->iPackageNumber = curPackageNumber;
+			pubFile->iTotalPackage = iTotalPackage;
+			array<Byte>^ byteData = pubFile->pack();
+			clientSocket->Send(byteData);
+			//delete[] pubFile->bData;
+		}
 
 
+		if (check == buffer->Length)
+			Server::getObject()->mainScreen->appendTextToChatBox("Sent " + pubFile->fileName + "(" + Convert::ToString(check) + ") bytes" + " to " + getUserNameBySocket(clientSocket) + " successfully !");
+		//delete[] buffer;
+
+	}
+	array<String^>^ getListOfFileName() {
+		array<String^>^ lines = nullptr;
+		lines = System::IO::File::ReadAllLines(fileNamePath);
+		
+		return lines;
+	}
+
+	void listFileNameResponse(Socket^ clientSocket) {
+		ListPublicFileNameClass^ listFileName = gcnew ListPublicFileNameClass();
+		listFileName->listFileName = getListOfFileName();
+		array<Byte>^ data = listFileName->pack();
+		clientSocket->Send(data);
+	}
+
+
+
+
+	bool addFileName(String^ fileName) {
+		try {
+			array<String^>^ lines = System::IO::File::ReadAllLines(fileNamePath);
+			for (int i = 0; i < lines->Length; i++)
+			{
+				if (lines[i]->Contains(fileName))
+				{
+					return false;
+				}
+			}
+			System::IO::File::AppendAllText(this->fileNamePath, fileName+"\n");
+		}
+		catch (Exception^ e) {
+			return false;
+		}
+
+		return true;
+	}
 };
 
 

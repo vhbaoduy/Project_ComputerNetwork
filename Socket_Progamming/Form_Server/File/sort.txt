@@ -1,0 +1,196 @@
+void bubbleSort(int a[], int n){
+	bool swapper = true;
+	for (int i = n-1; i >= 1; i--){
+		for (int j = 0; j < i; j++){
+			if (a[j] > a[j+1]){
+				int temp = a[j];
+				a[j] = a[j+1];
+				a[j+1] = temp;
+				swapper = false;
+			}
+		}
+		if (swapper){
+			break;
+		}
+	}
+} 
+
+
+
+void insertionSort(int a[], int n){
+	int index, value;
+	for (int i = 1; i < n; i++){
+		index = i;
+		value = a[i];
+		while (index > 0 && a[index - 1] > value){
+			a[index] = a[index - 1];
+			index --;
+		}
+		a[index] = value;
+	}
+} 
+
+
+void selectionSort(int a[], int n){
+	int indexMin;
+	for (int i = 0; i < n-1; i++){
+		indexMin = i;
+		for (int j = i+1; j < n; j++){
+			if (a[indexMin] > a[j]){
+				indexMin = j;
+			}
+		}
+		if (i != indexMin){
+			int temp = a[i];
+			a[i] = a[indexMin];
+			a[indexMin] = temp;
+		}
+	}
+} 
+
+
+void merge(int arr[], int l, int m, int r){
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 =  r - m;
+    int L[n1], R[n2];
+    for (i = 0; i < n1; i++){
+    	L[i] = arr[l + i];
+	}  
+    for (j = 0; j < n2; j++){
+    	R[j] = arr[m + 1+ j];
+	}
+    i = 0;
+    j = 0; 
+    k = l; 
+    while (i < n1 && j < n2){
+        if (L[i] <= R[j]){
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+    while (i < n1){
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+    while (j < n2){
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+void mergeSort(int a[], int l, int r){
+    if (l < r){
+        int m = l+(r-l)/2;
+        mergeSort(a, l, m);
+        mergeSort(a, m+1, r);
+        merge(a, l, m, r);
+    }
+}
+
+void shellSort(int a[], int n){
+	int interval, i, j, temp;
+	for(interval = n/2; interval > 0; interval /= 2){
+		for(i = interval; i < n; i++){
+			temp = a[i];
+			for(j = i; j >= interval && a[j - interval] > temp; j -= interval){
+				a[j] = a[j - interval];				
+			}
+			a[j] = temp;
+		}
+    }
+}
+
+
+void quickSort(int a[], int l, int r){
+	int p = a[(l+r)/2];
+	int i = l, j = r;
+	while (i < j){
+		while (a[i] < p){
+			i++;
+		}
+		while (a[j] > p){
+			j--;
+		}
+		if (i <= j){
+			int temp = a[i];
+			a[i] = a[j];
+			a[j] = temp;
+			i++;
+			j--;
+		}
+	}
+	if (i < r){
+		quickSort(a, i, r);
+	}
+	if (l < j){
+		quickSort(a, l, j);
+	}
+}
+
+
+bool checkAvl(node *t){
+	if (t == NULL) 	return true;
+	if (abs(treeLevel(t->left) - treeLevel(t->right)) > 1) return false;
+	return checkAvl(t->left) && checkAvl(t->right);
+}
+node *turnRight(node *a){
+	node *b = a->left;
+	node *d = b->right;
+	a->left = d;
+	b->right = a;
+	return b;
+}
+node *turnLeft(node *a){
+	node *b = a->right;
+	node *c = b->left;
+	a->right = c;
+	b->left = a;
+	return b;
+}
+void printTree(node *t){
+	if (t != NULL){
+		printTree(t->left);
+		cout << t->data << " ";
+		if (t->left != NULL) cout <<t->left->data << " ";
+		if (t->right != NULL) cout << t->right->data << " ";
+		cout << endl;
+		printTree(t->right);
+	}
+}
+node *updateTreeAvl(node *t){
+	if (abs(treeLevel(t->left) - treeLevel(t->right)) > 1){
+		if (treeLevel(t->left) > treeLevel(t->right)){
+			node *p = t->left;
+			if (treeLevel(p->left) >= treeLevel(p->right)){
+				t = turnRight(t);
+			} else{
+				t->left = turnLeft(t->left);
+				t = turnRight(t);
+			}
+		} else {
+			node *p = t->right;
+			if (treeLevel(p->right) >= treeLevel(p->left)){
+				t = turnLeft(t);
+			} else{
+				t->right = turnRight(t->right);
+				t = turnLeft(t);
+			
+			}
+		}	
+	}
+	if (t->left != NULL) t->left = updateTreeAvl(t->left);
+	if (t->right != NULL) t->right = updateTreeAvl(t->right);
+	return t;
+}
+int count(node *t, int x){
+	if (t == NULL) return 0;
+	if (t->data == x) return 1 + count(t->left, x) + count(t->right, x);
+	else if (t->data < x) return count(t->right, x);
+	return count(t->left, x);
+}

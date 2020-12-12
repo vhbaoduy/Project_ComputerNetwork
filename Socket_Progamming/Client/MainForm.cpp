@@ -95,3 +95,8 @@ System::Void Form_Client::MainForm::button_myInfor_Click(System::Object^ sender,
 	CentralController::getObject()->requestInfor(CentralController::getObject()->userName);
 }
 
+System::Void Form_Client::MainForm::button_publicFile_Click(System::Object^ sender, System::EventArgs^ e) {
+	CentralController::getObject()->publicFileForm = gcnew Form_Client::PublicFileForm();
+	CentralController::getObject()->publicFileForm->Show();
+}
+

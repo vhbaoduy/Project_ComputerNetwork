@@ -7,12 +7,13 @@ using namespace System::Windows::Forms;
 using namespace System::Text;
 using namespace System::Collections::Generic;
 using namespace System::Threading;
+using namespace System::IO;
 
 
 ref class StructClass abstract
 {
 public:
-	enum class MessageType { LogIn, ResponseLogin, SignUp, ResponseSignUp, LogInNotification, LogOutNotification, PublicChat, PrivateChat, UserStatus, RequestSendFile, ResponseSendFile, PrivateFile, ChangePassword,ResponseChangePassword,SetInfor,RequestInfor,ResponseInfor};
+	enum class MessageType { LogIn, ResponseLogin, SignUp, ResponseSignUp, LogInNotification, LogOutNotification, PublicChat, PrivateChat, UserStatus, RequestSendFile, ResponseSendFile, PrivateFile, ChangePassword, ResponseChangePassword, SetInfor, RequestInfor, ResponseInfor, UploadPublicFile, DownloadPublicFile,ListPublicFileName,RequestSendPublicFile};
 	MessageType messageType;
 	virtual array<Byte>^ pack() = 0;
 	virtual StructClass^ unpack(array<Byte>^ buffer) = 0;

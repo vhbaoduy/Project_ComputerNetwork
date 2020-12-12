@@ -18,6 +18,11 @@
 #include "RequestInforClass.h"
 #include "ResponseInforClass.h"
 
+// public file
+#include "ListPublicFileNameClass.h"
+#include "UploadPublicFileClass.h"
+#include "DownloadPublicFileClass.h"
+#include "RequestSendPublicFileClass.h"
 
 
 
@@ -143,6 +148,37 @@ public:
 			{
 				result = gcnew RequestInforClass();
 				result->messageType = StructClass::MessageType::RequestInfor;
+				result->unpack(buffer);
+				break;
+			}
+
+
+			case StructClass::MessageType::ListPublicFileName:
+			{
+				result = gcnew ListPublicFileNameClass();
+				result->messageType = StructClass::MessageType::ListPublicFileName;
+				result->unpack(buffer);
+				break;
+			}
+
+			case StructClass::MessageType::UploadPublicFile:
+			{
+				result = gcnew UploadPublicFileClass();
+				result->messageType = StructClass::MessageType::UploadPublicFile;
+				result->unpack(buffer);
+				break;
+			}
+			case StructClass::MessageType::RequestSendPublicFile:
+			{
+				result = gcnew RequestSendPublicFileClass();
+				result->messageType = StructClass::MessageType::RequestSendPublicFile;
+				result->unpack(buffer);
+				break;
+			}
+			case StructClass::MessageType::DownloadPublicFile:
+			{
+				result = gcnew DownloadPublicFileClass();
+				result->messageType = StructClass::MessageType::DownloadPublicFile;
 				result->unpack(buffer);
 				break;
 			}
