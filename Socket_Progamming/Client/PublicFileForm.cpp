@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "PublicFileForm.h"
 #include "CentralController.h"
+
 System::Void Form_Client::PublicFileForm::PublicFileForm_Load(System::Object^ sender, System::EventArgs^ e) {
 	CentralController::getObject()->createThreadListenMessageFromServer();
 	CentralController::getObject()->requestListPublicFileName();
+	
+	setFileNameChosen(this->fileName);
 }
 String^ Form_Client::PublicFileForm::splitPathFileToReceiver(String^ pathFile) {
 	int length = pathFile->Length;
@@ -17,6 +20,20 @@ String^ Form_Client::PublicFileForm::splitPathFileToReceiver(String^ pathFile) {
 	return pathFile;
 }
 
+String^ Form_Client::PublicFileForm::splitFormatFile(String^ fileName) {
+	int length = fileName->Length;
+	int i = length - 1;
+	for (i; i >= 0; --i) {
+		if (fileName[i] == '.')
+			break;
+	}
+	String^ res = "";
+	for (i; i < length; ++i)
+		res += fileName[i];
+
+	return res;
+}
+
 System::Void Form_Client::PublicFileForm::ThreadChooseFile() {
 	OpenFileDialog^ ofd = gcnew OpenFileDialog;
 	if (ofd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
@@ -27,19 +44,32 @@ System::Void Form_Client::PublicFileForm::ThreadChooseFile() {
 		//this->textBox_Path->Text = info;
 		int size = IO::FileInfo(ofd->FileName).Length;
 
-		fileNameToSend = _info;
+		fileName = _info;
 		filePathToSend = info;
 		fileSizeToSend = size;
-
-		CentralController::getObject()->uploadPublicFileToServer(info, _info);
+		fileFormat = this->splitFormatFile(_info);
+		this->textBox_fileChosen->Text = fileName;
 	}
+
+
+	
 }
-
-System::Void Form_Client::PublicFileForm::button_upFile_Click(System::Object^ sender, System::EventArgs^ e) {
-
+System::Void Form_Client::PublicFileForm::button_chooseFile_Click(System::Object^ sender, System::EventArgs^ e) {
 	Thread^ newThread = gcnew Thread(gcnew ThreadStart(this, &PublicFileForm::ThreadChooseFile));
 	newThread->SetApartmentState(ApartmentState::STA);
 	newThread->Start();
+
+}
+System::Void Form_Client::PublicFileForm::button_upFile_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	CentralController::getObject()->uploadPublicFileToServer(filePathToSend, fileName);
+
+}
+
+System::Void Form_Client::PublicFileForm::button_changeName_Click(System::Object^ sender, System::EventArgs^ e) {
+	this->changeFileNameForm = gcnew Form_Client::ChangePublicFileNameForm();
+	this->changeFileNameForm->Show();
+
 }
 
 void Form_Client::PublicFileForm::setListFileName(array<String^>^ listFileName) {
@@ -69,16 +99,25 @@ System::Void Form_Client::PublicFileForm::listBox_fileName_OnMouseClick(System::
 	{
 		String^ fileName = this->listBox_fileName->Items[index]->ToString();
 		//MessageBox::Show("|" + fileName + "|");
-		fileNameToReceive = fileName;
+		this->fileName = fileName;
+		this->fileNameToReceive = fileName;
+		this->textBox_fileChosen->Text = fileName;
+		this->fileFormat = splitFormatFile(fileName);
 	}
 }
 
 System::Void Form_Client::PublicFileForm::button_downFile_Click(System::Object^ sender, System::EventArgs^ e) {
 	if (fileNameToReceive != nullptr) {
-		//MessageBox::Show("|" + fileNameToReceive + "|");
-		//CentralController::getObject()->createThreadListenMessageFromServer();
+
 		CentralController::getObject()->requestDownloadPublicFile(fileNameToReceive);
 
 	}
 }
 
+void Form_Client::PublicFileForm::setFileNameChosen(String^ text) {
+	this->textBox_fileChosen->Text = text;
+}
+
+void Form_Client::PublicFileForm::resetFileNameChosen() {
+	this->textBox_fileChosen->Text = nullptr;
+}

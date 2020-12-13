@@ -43,11 +43,18 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 int receive = socket->Receive(buffer);
 			 //MessageBox::Show(Convert::ToString(buffer->Length));
 			 StructClass^ messageReceived = ProcessApp::unpack(buffer);
-			 if (messageReceived == nullptr)
-				 //MessageBox::Show("mess null");
+			 if (messageReceived == nullptr) {
+				 //MessageBox::Show(Convert::ToString(buffer->Length));
+				//MessageBox::Show("mess null");
+				 //StructClass::MessageType messageType = (StructClass::MessageType)BitConverter::ToInt32(buffer, 0);
+				 //ResponsePackageClass^ rpPackage = gcnew ResponsePackageClass();
+				 //Server::getObject()->soc
+				 //array<Byte>^ data = rpPackage->pack();
+				 //socket->Send(data);
 				 continue;
-			 if (sizeof(messageReceived->messageType) != 4)
-				 MessageBox::Show("mess type");
+				 //MessageBox::Show(Convert::ToString(messageType));
+			 }
+				 //continue;
 			 switch (messageReceived->messageType)
 			 {
 			 case StructClass::MessageType::LogIn:
@@ -165,7 +172,8 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 {
 				 UploadPublicFileClass^ pubFile = (UploadPublicFileClass^)messageReceived;
 				 try {
-					 
+					 //MessageBox::Show(pubFile->fileName + "\n" + Convert::ToString(pubFile->iFileSize) + "\n" + Convert::ToString(pubFile->iPackageNumber) + "\n" + Convert::ToString(pubFile->iTotalPackage));
+
 					 if (pubFile->iPackageNumber == 1) {
 						 Server::getObject()->addFileName(pubFile->fileName);
 						Server::getObject()->fileStream = gcnew System::IO::FileStream(Server::getObject()->filePath+pubFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
@@ -178,13 +186,21 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 					 if (pubFile->iPackageNumber == pubFile->iTotalPackage)
 					 {
 						 if ((int)Server::getObject()->fileStream->Length == pubFile->iFileSize)
-							 Server::getObject()->mainScreen->appendTextToChatBox(Server::getObject()->getUserNameBySocket(socket) + " sent " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ")bytes successfully!");
+							 Server::getObject()->mainScreen->appendTextToChatBox(Server::getObject()->getUserNameBySocket(socket) + " upload " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ")bytes successfully!");
 						else
-							 Server::getObject()->mainScreen->appendTextToChatBox(Server::getObject()->getUserNameBySocket(socket) + " sent " + pubFile->fileName + "(" + Convert::ToString((int)Server::getObject()->fileStream->Length) + ")bytes (missed "+ Convert::ToString(pubFile->iFileSize-(int)Server::getObject()->fileStream->Length) + "bytes)");
-						 
-						 Server::getObject()->fileStream->Close();
-						 Server::getObject()->fileStream = nullptr;
+							 Server::getObject()->mainScreen->appendTextToChatBox(Server::getObject()->getUserNameBySocket(socket) + " upload " + pubFile->fileName + "(" + Convert::ToString((int)Server::getObject()->fileStream->Length) + ")bytes (missed "+ Convert::ToString(pubFile->iFileSize-(int)Server::getObject()->fileStream->Length) + "bytes)");
+						 if (Server::getObject()->fileStream != nullptr) {
+							 Server::getObject()->fileStream->Close();
+							 Server::getObject()->fileStream = nullptr;
+						 }
 					 }
+					 //ResponsePackageClass^ rpPackage = gcnew ResponsePackageClass();
+					 //rpPackage->isSuccessful = true;
+					 //rpPackage->iPackageNumber = pubFile->iPackageNumber;
+					 ////Server::getObject()->soc
+					 //array<Byte>^ data = rpPackage->pack();
+					 //socket->Send(data);
+					 break;
 				 }
 				 catch (Exception^ e) {
 					 //Server::getObject()->fileStream->Close();
@@ -201,16 +217,9 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 				 try {
 					 RequestSendPublicFileClass^ pubFile = (RequestSendPublicFileClass^)messageReceived;
 					 Server::getObject()->sendPublicFile(pubFile->fileName,socket);
-					 if (Server::getObject()->fileStream != nullptr) {
-						 Server::getObject()->fileStream->Close();
-						 Server::getObject()->fileStream = nullptr;
-					 }
 					
 				 }
 				 catch (Exception^ e) {
-
-					 Server::getObject()->fileStream->Close();
-					 Server::getObject()->fileStream = nullptr;
 					 MessageBox::Show(e->Message, "Error server(Send Public File)");
 				 }
 				 break;
@@ -222,7 +231,7 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 			 delete[] buffer;
 		 }
 		 catch (Exception^ e) {
-			 MessageBox::Show(e->Message, "Error server by " + Server::getObject()->getUserNameBySocket(socket));
+			 MessageBox::Show(e->Message, "Error server");
 			 return;
 
 		 }

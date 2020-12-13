@@ -148,6 +148,9 @@
     <ClInclude Include="ChangePasswordForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="ChangePublicFileNameForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ConnectServer.h">
       <FileType>CppForm</FileType>
@@ -173,6 +176,7 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="ChangePasswordForm.cpp" />
+    <ClCompile Include="ChangePublicFileNameForm.cpp" />
     <ClCompile Include="ConnectServer.cpp" />
     <ClCompile Include="LogIn.cpp" />
     <ClCompile Include="main.cpp" />
@@ -201,6 +205,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ChangePasswordForm.resx">
       <DependentUpon>ChangePasswordForm.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChangePublicFileNameForm.resx">
+      <DependentUpon>ChangePublicFileNameForm.h</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConnectServer.resx">
       <DependentUpon>ConnectServer.h</DependentUpon>

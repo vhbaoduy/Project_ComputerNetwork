@@ -4,8 +4,8 @@
 #include "MainForm.h"
 
 
-#define DEFAULT_BUFFER_LENGTH 2560 // buffer file + buffer others
-#define BUFFER_SIZE 2048
+#define DEFAULT_BUFFER_LENGTH 102912 // buffer file + buffer others
+#define BUFFER_SIZE 102400
 
 
 //ref class Client {
@@ -66,7 +66,7 @@ public:
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "192.168.18.111";
+		this->serverIpAddress = "192.168.18.122";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}
@@ -529,31 +529,48 @@ public:
 		pubFile->fileName = fileName;
 		pubFile->iFileSize = buffer->Length;
 		int check = 0;
-		int sum = buffer->Length;
-		int counter = 0;
-		int curPackageNumber = 1;
-		int iTotalPackage = sum / (BUFFER_SIZE + 1) + 1;
-		//prvChatForm->setUpProcessBar(1, iTotalPackage);
-		for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
-		{
-
-			int copyLength = BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
-			sum -= copyLength;
-			pubFile->bData = gcnew array<Byte>(copyLength);
-			System::Array::Copy(buffer, counter, pubFile->bData, 0, copyLength);
-			counter += copyLength;
-			check += pubFile->bData->Length;
-			pubFile->iPackageNumber = curPackageNumber;
+		try {
+			
+			int sum = buffer->Length;
+			int counter = 0;
+			int curPackageNumber = 1;
+			int iTotalPackage = sum / (BUFFER_SIZE + 1) + 1;
 			pubFile->iTotalPackage = iTotalPackage;
-			array<Byte>^ byteData = pubFile->pack();
-			clientSocket->Send(byteData);
-			//delete[] pubFile->bData;
+			//prvChatForm->setUpProcessBar(1, iTotalPackage);
+			for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
+			{
+
+				int copyLength = BUFFER_SIZE < sum ? BUFFER_SIZE : (sum % BUFFER_SIZE);
+				sum -= copyLength;
+				pubFile->bData = gcnew array<Byte>(copyLength);
+				System::Array::Copy(buffer, counter, pubFile->bData, 0, copyLength);
+				counter += copyLength;
+				
+				pubFile->iPackageNumber = curPackageNumber;
+
+				array<Byte>^ byteData = pubFile->pack();
+				clientSocket->Send(byteData);
+				check += pubFile->bData->Length;
+				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(copyLength));
+				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(counter));
+				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(pubFile->bData->Length));
+				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(byteData->Length));
+
+				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(curPackageNumber));
+				Thread::Sleep(5);
+				delete[] pubFile->bData;
+				delete[] byteData;
+
+			}
+
+			if (check == buffer->Length)
+				Server::getObject()->mainScreen->appendTextToChatBox("Sent " + pubFile->fileName + "(" + Convert::ToString(check) + " bytes)" + " to " + getUserNameBySocket(clientSocket) + " successfully !");
+
+			delete[] buffer;
 		}
-
-
-		if (check == buffer->Length)
-			Server::getObject()->mainScreen->appendTextToChatBox("Sent " + pubFile->fileName + "(" + Convert::ToString(check) + ") bytes" + " to " + getUserNameBySocket(clientSocket) + " successfully !");
-		//delete[] buffer;
+		catch (Exception^ e) {
+			return;
+		}
 
 	}
 	array<String^>^ getListOfFileName() {

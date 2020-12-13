@@ -10,8 +10,9 @@
 #include "SetInforForm.h"
 #include "PublicFileForm.h"
 
-#define DEFAULT_BUFFER_LENGTH 2560
-#define BUFFER_SIZE 2048
+
+#define DEFAULT_BUFFER_LENGTH 102912
+#define BUFFER_SIZE 102400
 
 ref class CentralController
 {
@@ -48,6 +49,8 @@ public:
 	Form_Client::ChangePasswordForm^ changePasswordForm = nullptr;
 	Form_Client::SetInforForm^ setInforForm = nullptr;
 	Form_Client::PublicFileForm^ publicFileForm = nullptr;
+	// change file name
+	
 	
 	Thread^ threadListenClient;
 	String^ userName = nullptr;
@@ -163,7 +166,7 @@ public:
 			}
 			switch (messageReceived->messageType) {
 			case StructClass::MessageType::LogIn:
-				MessageBox::Show("Login message?");
+				//MessageBox::Show("Login message?");
 				
 				break;
 			case StructClass::MessageType::ResponseLogin:
@@ -192,7 +195,7 @@ public:
 			}
 			case StructClass::MessageType::SignUp:
 			{
-				MessageBox::Show("Sign up received?");
+				//MessageBox::Show("Sign up received?");
 				
 				break;
 			}
@@ -332,11 +335,12 @@ public:
 			{
 				try {
 					PrivateFile^ prvFile = (PrivateFile^)messageReceived;
-					setPrivateMessage(prvFile->userName, "Receiving...");
+					
 					Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(prvFile->userName);
 					//else
 						//setPrivateMessage(prvFile->userName, nullptr);
 					if (prvFile->iPackageNumber == 1) {
+						setPrivateMessage(prvFile->userName, "Receiving...");
 						CentralController::getObject()->createThreadListenMessageFromServer();
 						prvChatForm->setUpProcessBar(1, prvFile->iTotalPackage);
 						prvChatForm->writerStream = gcnew System::IO::FileStream(prvChatForm->pathFileToReceiver + prvFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
@@ -367,28 +371,36 @@ public:
 			{
 				DownloadPublicFileClass^ pubFile = (DownloadPublicFileClass^)messageReceived;
 				try{
+						//CentralController::getObject()->createThreadListenMessageFromServer();
+						
+						//MessageBox::Show(pubFile->fileName + "\n" + Convert::ToString(pubFile->iFileSize) + "\n" + Convert::ToString(pubFile->iPackageNumber) + "\n" + Convert::ToString(pubFile->iTotalPackage));
+						if (pubFile->iPackageNumber == 1) {
+							
+							//MessageBox::Show("khoi tao writer");
+							CentralController::getObject()->publicFileForm->fileSize = pubFile->iFileSize;
+							CentralController::getObject()->publicFileForm->writerStream = gcnew System::IO::FileStream(CentralController::getObject()->publicFileForm->pathFileToReceiver + CentralController::getObject()->publicFileForm->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
+
+							//MessageBox::Show("set bar");
+							CentralController::getObject()->publicFileForm->setUpProcessBar(1, pubFile->iTotalPackage);
+						}
+
+						CentralController::getObject()->publicFileForm->writerStream->Write(pubFile->bData, 0, pubFile->bData->Length);
 					
-					if (pubFile->iPackageNumber == 1) {
-						CentralController::getObject()->createThreadListenMessageFromServer();
-						
-						CentralController::getObject()->publicFileForm->writerStream = gcnew System::IO::FileStream(CentralController::getObject()->publicFileForm->pathFileToReceiver + CentralController::getObject()->publicFileForm->fileNameToReceive, System::IO::FileMode::Create, System::IO::FileAccess::Write);
-						//CentralController::getObject()->publicFileForm->setUpProcessBar(1, pubFile->iTotalPackage);
-					}
-					//CentralController::getObject()->publicFileForm->writerStream = System::IO::File::OpenWrite(CentralController::getObject()->publicFileForm->pathFileToReceiver + CentralController::getObject()->publicFileForm->fileNameToReceive);
-					CentralController::getObject()->publicFileForm->writerStream->Write(pubFile->bData, 0, pubFile->bData->Length);
-					//System::IO::File::WriteAllBytes(CentralController::getObject()->publicFileForm->pathFileToReceiver + CentralController::getObject()->publicFileForm->fileNameToReceive, pubFile->bData);
-					//CentralController::getObject()->publicFileForm->setValueOfProcessBar(pubFile->iPackageNumber);
-					if (pubFile->iPackageNumber == pubFile->iTotalPackage) {
-						//CentralController::getObject()->publicFileForm->resetProcessBar();
-						if (pubFile->iFileSize == (int)CentralController::getObject()->publicFileForm->writerStream->Length)
-							MessageBox::Show("Downloaded " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ") bytes successfully!", "Notification");
-						else
-							MessageBox::Show("Downloaded " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ") bytes (missed " + Convert::ToString(pubFile->iFileSize - (int)CentralController::getObject()->publicFileForm->writerStream->Length) + "bytes)!", "Notification");
-						CentralController::getObject()->publicFileForm->writerStream->Close();
-						CentralController::getObject()->publicFileForm->writerStream = nullptr;
-						
-						
-					}
+						CentralController::getObject()->publicFileForm->setValueOfProcessBar(pubFile->iPackageNumber);
+						if (pubFile->iPackageNumber == pubFile->iTotalPackage) {
+							CentralController::getObject()->publicFileForm->resetProcessBar();
+							if (pubFile->iFileSize == (int)CentralController::getObject()->publicFileForm->writerStream->Length)
+								MessageBox::Show("Downloaded " + CentralController::getObject()->publicFileForm->fileName + "(" + Convert::ToString(pubFile->iFileSize) + " bytes) successfully!", "Notification");
+							else
+								MessageBox::Show("Downloaded " + CentralController::getObject()->publicFileForm->fileName + "(" + Convert::ToString(pubFile->iFileSize) + " bytes) (missed " + Convert::ToString(pubFile->iFileSize - (int)CentralController::getObject()->publicFileForm->writerStream->Length) + "bytes)!", "Notification");
+							if (CentralController::getObject()->publicFileForm->writerStream != nullptr) {
+								CentralController::getObject()->publicFileForm->writerStream->Close();
+								CentralController::getObject()->publicFileForm->writerStream = nullptr;
+
+							}
+							CentralController::getObject()->publicFileForm->resetFileNameChosen();
+
+						}
 
 				}
 
@@ -399,6 +411,7 @@ public:
 				}
 				break;
 			}
+		
 
 			default:
 				break;
@@ -451,56 +464,7 @@ public:
 		//System::IO::FileStream^ writeStream = gcnew System::IO::FileStream(_FileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
 		try
 		{
-			//fileStream = gcnew System::IO::FileStream(_FilePath, System::IO::FileMode::Open, System::IO::FileAccess::Read);
-			////writeSteam = gcnew FileStream("Debug/" + _FilePath, FileMode::Create, FileAccess::Write);
-
-			//int length = (int)fileStream->Length;  // get file length
-   //        // create buffer
-			//int count;                            // actual number of bytes read
-			//int sum = 0;                          // total number of bytes read
-			//int SIZE = 512;
-			// read until Read method returns 0 (end of the stream has been reached)
-			/*int curPackageNumber = 1;
-			int iTotalPackage = length / (BUFFER_SIZE + 1) + 1;
-			prvChatForm->setUpProcessBar(1, iTotalPackage);
-			while (1) {
-				buffer = gcnew array<Byte>(BUFFER_SIZE);
-				count = fileStream->Read(buffer, 0, BUFFER_SIZE);
-				if (count == 0)
-					break;
-				else {
-					prvFile->bData = gcnew array<Byte>(count);
-					System::Array::Copy(buffer, 0, prvFile->bData, 0, count);
-					prvFile->iPackageNumber = curPackageNumber;
-					prvFile->iTotalPackage = iTotalPackage;
-					array<Byte>^ byteData = prvFile->pack();
-					setPrivateMessage(_ToUsername, "Sending...");
-					CentralController::getObject()->appSocket->sendMessage(byteData);
-					prvChatForm->setValueOfProcessBar(curPackageNumber++);
-					delete[] prvFile->bData;
-				}
-
-
-
-				delete[] buffer;
-			}*/
-
-
-			//buffer = gcnew array<Byte>(length);
-			//while (length > 0) {
-			//	count = fileStream->Read(buffer, sum, length);
-			//	if (count == 0)
-			//		break;
-			//	sum += count;
-			//	length -= count;
-			//}
-			//length = buffer->Length;
-
-
-			//while ((count = fileStream->Read(buffer,sum,length-sum)) >0)
-			//{
-			//	sum += count;
-			//}
+		
 			buffer = System::IO::File::ReadAllBytes(_FilePath);
 			int sum = buffer->Length;
 			int counter = 0;
@@ -519,9 +483,11 @@ public:
 				prvFile->iPackageNumber = curPackageNumber;
 				prvFile->iTotalPackage = iTotalPackage;
 				array<Byte>^ byteData = prvFile->pack();
-				setPrivateMessage(_ToUsername, "Sending...");
+				if(curPackageNumber == 1)
+					setPrivateMessage(_ToUsername, "Sending...");
 				CentralController::getObject()->appSocket->sendMessage(byteData);
 				prvChatForm->setValueOfProcessBar(curPackageNumber);
+				Thread::Sleep(5);
 				delete[] prvFile->bData;
 			}
 			delete[] buffer;
@@ -535,11 +501,6 @@ public:
 		{
 			prvChatForm->resetProcessBar();
 			setPrivateMessage(_ToUsername, "Sent " + _FileName + "(" + Convert::ToString(prvChatForm->fileSizeToSend) + "bytes)  successfully !");
-			/*if (fileStream != nullptr) {
-				fileStream->Close();
-				prvChatForm->resetProcessBar();
-				setPrivateMessage(_ToUsername, "Sent " + _FileName + "(" + Convert::ToString(prvChatForm->fileSizeToSend) + "bytes)  successfully !");
-			}*/
 		}
 
 
@@ -583,45 +544,7 @@ public:
 
 		return 0;
 	}
-	int setPrivateMessage(String^ _ToUsername)
-	{
-		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
-		if (prvChatForm != nullptr)
-		{
-		}
-		else
-		{
-			Form_Client::PrivateChatForm^ pChat = gcnew Form_Client::PrivateChatForm(this->userName, _ToUsername);
-			CentralController::getObject()->lstPrivateChatForm->Add(pChat);
-			Application::Run(pChat);
-			//threadListenClient = gcnew Thread(gcnew ParameterizedThreadStart(CentralController::threadPrivateChatForm));
-			//threadListenClient->IsBackground = true;
-			//threadListenClient->Start(pChat);
-		}
 
-		return 0;
-	}
-	int setPrivateFileProcess(String^ _ToUsername, int value)
-	{
-		Form_Client::PrivateChatForm^ prvChatForm = getPrivateChatFormByFriendUsername(_ToUsername);
-		if (prvChatForm != nullptr)
-		{
-			prvChatForm->setValueOfProcessBar(value);
-		}
-		else
-		{
-			Form_Client::PrivateChatForm^ pChat = gcnew Form_Client::PrivateChatForm(this->userName, _ToUsername);
-			CentralController::getObject()->lstPrivateChatForm->Add(pChat);
-			setPrivateFileProcess(_ToUsername, value); //Re set private message
-
-			Application::Run(pChat);
-			//threadListenClient = gcnew Thread(gcnew ParameterizedThreadStart(CentralController::threadPrivateChatForm));
-			//threadListenClient->IsBackground = true;
-			//threadListenClient->Start(pChat);
-		}
-
-		return 0;
-	}
 
 	int setInfor(String^ _Username, String^ _Birthdate)
 	{
@@ -708,88 +631,21 @@ public:
 		return 0;
 	}
 
-	int receiveFileFormServer(DownloadPublicFileClass^& pubFile) {
-		//DownloadPublicFileClass^ pubFile = (DownloadPublicFileClass^)messageReceived;
-		if (pubFile->iPackageNumber == 1) {
-			//CentralController::getObject()->createThreadListenMessageFromServer();
-			CentralController::getObject()->publicFileForm->writerStream = gcnew System::IO::FileStream(CentralController::getObject()->publicFileForm->pathFileToReceiver + CentralController::getObject()->publicFileForm->fileNameToReceive, System::IO::FileMode::Create, System::IO::FileAccess::Write);
-			CentralController::getObject()->publicFileForm->setUpProcessBar(1, pubFile->iTotalPackage);
-		}
-		CentralController::getObject()->publicFileForm->writerStream->Write(pubFile->bData, 0, pubFile->bData->Length);
-		CentralController::getObject()->publicFileForm->setValueOfProcessBar(pubFile->iPackageNumber);
+	
 
-		if (pubFile->iPackageNumber == pubFile->iTotalPackage) {
-			if (pubFile->iFileSize == (int)CentralController::getObject()->publicFileForm->writerStream->Length)
-				MessageBox::Show("Downloaded " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ") bytes successfully!", "Notification");
-			else
-				MessageBox::Show("Downloaded " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ") bytes (missed " + Convert::ToString(pubFile->iFileSize - (int)CentralController::getObject()->publicFileForm->writerStream->Length) + "bytes)", "Notification");
-			CentralController::getObject()->publicFileForm->writerStream->Close();
-			CentralController::getObject()->publicFileForm->writerStream = nullptr;
-			CentralController::getObject()->publicFileForm->resetProcessBar();
-		}
+	void uploadPublicFileToServer(String^ filePath, String^ newFileName) {
 
-		return 0;
-
-	}
-
-	void uploadPublicFileToServer(String^ filePath, String^ fileName) {
-		//CentralController::getObject()->createThreadListenMessageFromServer();
-		//CentralController::getObject()->createThreadListenMessageFromServer();
 		UploadPublicFileClass^ pubFile = gcnew UploadPublicFileClass();
-
-		//Spit to smaller packages to send to server
-		//array<Byte>^ buffer;
 		array<Byte>^ buffer = System::IO::File::ReadAllBytes(filePath);
-		pubFile->fileName = fileName;
+	
+		
+		pubFile->fileName = newFileName;
 		pubFile->iFileSize = buffer->Length;
 		int check = 0;
-		//System::IO::FileStream^ fileStream = nullptr;
-		//System::IO::FileStream^ writeStream = gcnew System::IO::FileStream(_FileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
+		
 		try
 		{
-			//fileStream = gcnew System::IO::FileStream(filePath, System::IO::FileMode::Open, System::IO::FileAccess::Read);
-			//writeSteam = gcnew FileStream("Debug/" + _FilePath, FileMode::Create, FileAccess::Write);
-
-			//int length = (int)fileStream->Length;  // get file length
-		   // create buffer
-			//int count;                            // actual number of bytes read
-			//int sum = 0;                          // total number of bytes read
-
-
 			
-			/*
-			int counter = 0;
-			int curPackageNumber = 1;
-			int iTotalPackage = length / (BUFFER_SIZE + 1) + 1;
-			CentralController::getObject()->publicFileForm->setUpProcessBar(1, iTotalPackage);
-			pubFile->iTotalPackage = iTotalPackage;
-
-			while (curPackageNumber <= iTotalPackage) {
-				buffer = gcnew array<Byte>(BUFFER_SIZE);
-				count = fileStream->Read(buffer, 0, BUFFER_SIZE);
-
-				if (count == 0)
-					break;
-				else {
-					pubFile->bData = gcnew array<Byte>(count);
-					System::Array::Copy(buffer, 0, pubFile->bData, 0, count);
-					pubFile->iPackageNumber = curPackageNumber;
-					array<Byte>^ byteData = pubFile->pack();
-					CentralController::getObject()->appSocket->sendMessage(byteData);
-					CentralController::getObject()->publicFileForm->setValueOfProcessBar(curPackageNumber++);
-
-					delete[]pubFile->bData;
-
-				}
-				delete[] buffer;
-			}*/
-			//length = buffer->Length;
-
-			//buffer = gcnew array<Byte>(length);
-			//while ((count = fileStream->Read(buffer,sum,length-sum)) >0)
-			//{
-			//	sum += count;
-			//}
 			int counter = 0;
 			int curPackageNumber = 1;
 			int sum = buffer->Length;
@@ -813,11 +669,11 @@ public:
 				array<Byte>^ byteData = pubFile->pack();
 				CentralController::getObject()->appSocket->sendMessage(byteData);
 				CentralController::getObject()->publicFileForm->setValueOfProcessBar(curPackageNumber);
+				Thread::Sleep(5);
 				delete[] pubFile->bData;
+				delete[] byteData;
 			}
 			
-
-
 
 		}
 		catch (Exception^ e)
@@ -829,18 +685,12 @@ public:
 		
 			CentralController::getObject()->requestListPublicFileName();
 			CentralController::getObject()->publicFileForm->resetProcessBar();
-			if (check == buffer->Length)
-				MessageBox::Show("Uploaded " + fileName + "(" + Convert::ToString(check) + ") bytes sucessfully!", "Notification");
-
-
+			if (check == buffer->Length) {
+				MessageBox::Show("Uploaded " + newFileName + "(" + Convert::ToString(check) + ") bytes sucessfully!", "Notification");
+				CentralController::getObject()->publicFileForm->resetFileNameChosen();
+			}
 			delete[] buffer;
-			//CentralController::getObject()->requestListPublicFileName();
-			//CentralController::getObject()->publicFileForm->resetProcessBar();
-	/*		if (fileStream != nullptr) {
-				fileStream->Close();
-				CentralController::getObject()->requestListPublicFileName();
-				CentralController::getObject()->publicFileForm->resetProcessBar();
-			}*/
+		
 		}
 
 	}

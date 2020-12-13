@@ -90,7 +90,7 @@ namespace Form_Server {
 			// label_Top2
 			// 
 			this->label_Top2->AutoSize = true;
-			this->label_Top2->Location = System::Drawing::Point(40, 12);
+			this->label_Top2->Location = System::Drawing::Point(113, 12);
 			this->label_Top2->Name = L"label_Top2";
 			this->label_Top2->Size = System::Drawing::Size(76, 17);
 			this->label_Top2->TabIndex = 2;
@@ -99,7 +99,7 @@ namespace Form_Server {
 			// label_Top3
 			// 
 			this->label_Top3->AutoSize = true;
-			this->label_Top3->Location = System::Drawing::Point(40, 46);
+			this->label_Top3->Location = System::Drawing::Point(113, 46);
 			this->label_Top3->Name = L"label_Top3";
 			this->label_Top3->Size = System::Drawing::Size(90, 17);
 			this->label_Top3->TabIndex = 3;
@@ -108,7 +108,7 @@ namespace Form_Server {
 			// textBox_IP
 			// 
 			this->textBox_IP->Enabled = false;
-			this->textBox_IP->Location = System::Drawing::Point(144, 12);
+			this->textBox_IP->Location = System::Drawing::Point(217, 12);
 			this->textBox_IP->Name = L"textBox_IP";
 			this->textBox_IP->Size = System::Drawing::Size(157, 22);
 			this->textBox_IP->TabIndex = 4;
@@ -117,7 +117,7 @@ namespace Form_Server {
 			// textBox_Port
 			// 
 			this->textBox_Port->Enabled = false;
-			this->textBox_Port->Location = System::Drawing::Point(144, 43);
+			this->textBox_Port->Location = System::Drawing::Point(217, 43);
 			this->textBox_Port->Name = L"textBox_Port";
 			this->textBox_Port->Size = System::Drawing::Size(157, 22);
 			this->textBox_Port->TabIndex = 5;
@@ -134,7 +134,7 @@ namespace Form_Server {
 			// 
 			// button_RunServer
 			// 
-			this->button_RunServer->Location = System::Drawing::Point(320, 22);
+			this->button_RunServer->Location = System::Drawing::Point(393, 22);
 			this->button_RunServer->Name = L"button_RunServer";
 			this->button_RunServer->Size = System::Drawing::Size(118, 36);
 			this->button_RunServer->TabIndex = 8;
@@ -163,7 +163,7 @@ namespace Form_Server {
 			this->textBox_chatBox->Name = L"textBox_chatBox";
 			this->textBox_chatBox->ReadOnly = true;
 			this->textBox_chatBox->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
-			this->textBox_chatBox->Size = System::Drawing::Size(263, 228);
+			this->textBox_chatBox->Size = System::Drawing::Size(349, 228);
 			this->textBox_chatBox->TabIndex = 10;
 			// 
 			// label_chatBox
@@ -179,7 +179,7 @@ namespace Form_Server {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(515, 368);
+			this->ClientSize = System::Drawing::Size(613, 368);
 			this->Controls->Add(this->label_chatBox);
 			this->Controls->Add(this->textBox_chatBox);
 			this->Controls->Add(this->textBox_listClients);

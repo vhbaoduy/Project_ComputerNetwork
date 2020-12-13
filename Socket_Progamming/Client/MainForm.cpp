@@ -96,7 +96,10 @@ System::Void Form_Client::MainForm::button_myInfor_Click(System::Object^ sender,
 }
 
 System::Void Form_Client::MainForm::button_publicFile_Click(System::Object^ sender, System::EventArgs^ e) {
+	//CentralController::getObject()->createThreadListenMessageFromServer();
 	CentralController::getObject()->publicFileForm = gcnew Form_Client::PublicFileForm();
+
 	CentralController::getObject()->publicFileForm->Show();
+	//Application::Run(CentralController::getObject()->publicFileForm);
 }
 
