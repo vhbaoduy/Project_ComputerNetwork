@@ -107,7 +107,6 @@ namespace Form_Server {
 			// 
 			// textBox_IP
 			// 
-			this->textBox_IP->Enabled = false;
 			this->textBox_IP->Location = System::Drawing::Point(217, 12);
 			this->textBox_IP->Name = L"textBox_IP";
 			this->textBox_IP->Size = System::Drawing::Size(157, 22);
@@ -116,7 +115,6 @@ namespace Form_Server {
 			// 
 			// textBox_Port
 			// 
-			this->textBox_Port->Enabled = false;
 			this->textBox_Port->Location = System::Drawing::Point(217, 43);
 			this->textBox_Port->Name = L"textBox_Port";
 			this->textBox_Port->Size = System::Drawing::Size(157, 22);

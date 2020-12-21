@@ -7,8 +7,7 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 	Server^ server = Server::getObject();
 
 
-	this->textBox_IP->Text = server->serverIpAddress;
-	this->textBox_Port->Text = Convert::ToString(server->serverPortAddress);
+	
 	this->textBox_listClients->Text = nullptr;
 
 	this->updateConnectedClient(server->getListOfClient());
@@ -23,13 +22,29 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 }
 
  System::Void Form_Server::MainForm::button_RunServer_Click(System::Object^ sender, System::EventArgs^ e) {
-	 Server^ controller = Server::getObject();
-	 
-	 if (!controller->initializeSocket()) {
-		 MessageBox::Show("Run Server successfully !", "Notification", MessageBoxButtons::OKCancel);
-		 this->button_RunServer->Enabled = false;
-		 this->textBox_IP->ReadOnly = true;
-		 this->textBox_Port->ReadOnly = true;
+	 //Server^ controller = Server::getObject();
+	 //controller->serverIpAddress = this->textBox_IP->Text;
+	 //controller->serverPortAddress = Convert::ToInt32(this->textBox_Port->Text);
+	 //this->textBox_IP->ReadOnly = true;
+	 //this->textBox_Port->ReadOnly = true;
+
+	 Server^ server = Server::getObject();
+	 server->serverIpAddress = this->textBox_IP->Text;
+	 server->serverPortAddress = Convert::ToInt32(this->textBox_Port->Text);
+
+	/* IPAddress^ serverIpAddress = IPAddress::Parse(server->serverIpAddress);
+	 int serverPort = server->serverPortAddress;
+	 IPEndPoint^ serverIpEndPoint = gcnew IPEndPoint(serverIpAddress, serverPort);
+
+	 server->serverSocket->Bind(serverIpEndPoint);
+	 server->serverSocket->Listen(10);*/
+	 if (!server->initializeSocket()) {
+	 MessageBox::Show("Run Server successfully !", "Notification", MessageBoxButtons::OKCancel);
+	 this->button_RunServer->Enabled = false;
+	 this->textBox_IP->Text = server->serverIpAddress;
+	 this->textBox_Port->Text = Convert::ToString(server->serverPortAddress);
+	 this->textBox_IP->ReadOnly = true;
+	 this->textBox_Port->ReadOnly = true;
 	 }
 
 	 backgroundWorker1->WorkerSupportsCancellation = true;
@@ -173,10 +188,16 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 				 UploadPublicFileClass^ pubFile = (UploadPublicFileClass^)messageReceived;
 				 try {
 					 //MessageBox::Show(pubFile->fileName + "\n" + Convert::ToString(pubFile->iFileSize) + "\n" + Convert::ToString(pubFile->iPackageNumber) + "\n" + Convert::ToString(pubFile->iTotalPackage));
+					 //if (pubFile->isEncrypted) {
+						 //pubFile->fileName = convertHexToString(pubFile->fileName);
+						 //MessageBox::Show(pubFile->fileName);
+						 //MessageBox::Show(convertStringToHex(BitConverter::ToString(bData)));
+						 //pubFile->bData = Convert::FromBase64String(Convert::ToBase64String(pubFile->bData));
 
+					 //}
 					 if (pubFile->iPackageNumber == 1) {
 						 Server::getObject()->addFileName(pubFile->fileName);
-						Server::getObject()->fileStream = gcnew System::IO::FileStream(Server::getObject()->filePath+pubFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
+						 Server::getObject()->fileStream = gcnew System::IO::FileStream(Server::getObject()->filePath + pubFile->fileName, System::IO::FileMode::Create, System::IO::FileAccess::Write);
 						 Server::getObject()->fileSize = pubFile->iFileSize;
 					 }
 
@@ -186,9 +207,9 @@ System::Void Form_Server::MainForm::MainForm_Load(System::Object^ sender, System
 					 if (pubFile->iPackageNumber == pubFile->iTotalPackage)
 					 {
 						 if ((int)Server::getObject()->fileStream->Length == pubFile->iFileSize)
-							 Server::getObject()->mainScreen->appendTextToChatBox(Server::getObject()->getUserNameBySocket(socket) + " upload " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ")bytes successfully!");
+							 Server::getObject()->mainScreen->appendTextToChatBox("[UPLOAD] "+Server::getObject()->getUserNameBySocket(socket) + " upload " + pubFile->fileName + "(" + Convert::ToString(pubFile->iFileSize) + ")bytes successfully!");
 						else
-							 Server::getObject()->mainScreen->appendTextToChatBox(Server::getObject()->getUserNameBySocket(socket) + " upload " + pubFile->fileName + "(" + Convert::ToString((int)Server::getObject()->fileStream->Length) + ")bytes (missed "+ Convert::ToString(pubFile->iFileSize-(int)Server::getObject()->fileStream->Length) + "bytes)");
+							 Server::getObject()->mainScreen->appendTextToChatBox("[UPLOAD] "+Server::getObject()->getUserNameBySocket(socket) + " upload " + pubFile->fileName + "(" + Convert::ToString((int)Server::getObject()->fileStream->Length) + ")bytes (missed "+ Convert::ToString(pubFile->iFileSize-(int)Server::getObject()->fileStream->Length) + "bytes)");
 						 if (Server::getObject()->fileStream != nullptr) {
 							 Server::getObject()->fileStream->Close();
 							 Server::getObject()->fileStream = nullptr;

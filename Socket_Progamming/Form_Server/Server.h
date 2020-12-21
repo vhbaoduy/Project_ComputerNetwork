@@ -66,7 +66,7 @@ public:
 		createSocket();
 	}
 	Server() {
-		this->serverIpAddress = "192.168.18.122";
+		this->serverIpAddress = "10.124.5.163";
 		this->serverPortAddress = 2020;
 		createSocket();
 	}
@@ -215,7 +215,7 @@ public:
 		if (checkLogin(userName, pw, errorMessage)) {
 			clients->Add(gcnew Client(clientSocket, userName));
 			this->mainScreen->updateConnectedClient(this->getListOfClient());
-			this->mainScreen->appendTextToChatBox(userName + " has just online !");
+			this->mainScreen->appendTextToChatBox("[LOG IN] " + userName + " has just online !");
 
 			logInResponse(true, errorMessage, clientSocket);
 			sendLogInNotification(userName, clientSocket);	
@@ -318,7 +318,7 @@ public:
 		logOut->userName = getUserNameBySocket(clientSocket);
 		array<Byte>^ data = logOut->pack();
 
-		this->mainScreen->appendTextToChatBox(logOut->userName + " has just offline!");
+		this->mainScreen->appendTextToChatBox("[LOG OUT] "+ logOut->userName + " has just offline!");
 		
 		removeClientByUserName(logOut->userName);
 		this->mainScreen->updateConnectedClient(getListOfClient());
@@ -360,7 +360,7 @@ public:
 		String^ userName = getUserNameBySocket(clientSocket);
 		String^ publicMessage = userName + ": " + message;
 
-		this->mainScreen->appendTextToChatBox(publicMessage);
+		this->mainScreen->appendTextToChatBox("[PUBLIC CHAT] "+ publicMessage);
 		PublicChat^ sendPublicMessage = gcnew PublicChat();
 		sendPublicMessage->message = publicMessage;
 		array<Byte>^ data = sendPublicMessage->pack();
@@ -370,7 +370,7 @@ public:
 				client->clientSocket->Send(data);
 			}
 			catch (Exception^ e) {
-				MessageBox::Show(e->Message, "Error server sendpublic");
+				MessageBox::Show(e->Message, "Error server (Send public message)");
 			}
 		}
 		
@@ -383,14 +383,14 @@ public:
 
 		PrivateChat^ privateMessage = gcnew PrivateChat();
 		if (receiverSocket == nullptr) {
-			privateMessage->message = "[SERVER], " + userNameReceiver + " is offline!";
+			privateMessage->message = "[SERVER]  " + userNameReceiver + " is offline!";
 			privateMessage->userNameReceiver = userNameReceiver;
 			array<Byte>^ data = privateMessage->pack();
 			senderSocket->Send(data);
 		}
 
 		else {
-			this->mainScreen->appendTextToChatBox("FROM " + sender + " TO " + userNameReceiver + ": " + message);
+			this->mainScreen->appendTextToChatBox("[PRIVATE CHAT] FROM " + sender + " TO " + userNameReceiver + ": " + message);
 			privateMessage->message = sender + ": " + message;
 			privateMessage->userNameReceiver = sender;
 			array<Byte>^ data = privateMessage->pack();
@@ -557,14 +557,14 @@ public:
 				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(byteData->Length));
 
 				//Server::getObject()->mainScreen->appendTextToChatBox(Convert::ToString(curPackageNumber));
-				Thread::Sleep(5);
+				Thread::Sleep(300);
 				delete[] pubFile->bData;
 				delete[] byteData;
 
 			}
 
 			if (check == buffer->Length)
-				Server::getObject()->mainScreen->appendTextToChatBox("Sent " + pubFile->fileName + "(" + Convert::ToString(check) + " bytes)" + " to " + getUserNameBySocket(clientSocket) + " successfully !");
+				Server::getObject()->mainScreen->appendTextToChatBox("[DOWNLOAD] Sent " + pubFile->fileName + "(" + Convert::ToString(check) + " bytes)" + " to " + getUserNameBySocket(clientSocket) + " successfully !");
 
 			delete[] buffer;
 		}

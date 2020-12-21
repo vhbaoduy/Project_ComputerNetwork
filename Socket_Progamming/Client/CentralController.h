@@ -11,8 +11,8 @@
 #include "PublicFileForm.h"
 
 
-#define DEFAULT_BUFFER_LENGTH 102912
-#define BUFFER_SIZE 102400
+#define DEFAULT_BUFFER_LENGTH 10752
+#define BUFFER_SIZE 10240
 
 ref class CentralController
 {
@@ -637,9 +637,14 @@ public:
 
 		UploadPublicFileClass^ pubFile = gcnew UploadPublicFileClass();
 		array<Byte>^ buffer = System::IO::File::ReadAllBytes(filePath);
-	
-		
+		/*
+		if (MessageBox::Show("Do you want to encrypt message before uploading ?", "Notification", MessageBoxButtons::YesNo) == DialogResult::Yes) {
+			pubFile->isEncrypted = true;
+			pubFile->fileName = convertStringToHex(newFileName);
+		}
+		else*/
 		pubFile->fileName = newFileName;
+		
 		pubFile->iFileSize = buffer->Length;
 		int check = 0;
 		
@@ -650,7 +655,7 @@ public:
 			int curPackageNumber = 1;
 			int sum = buffer->Length;
 			int iTotalPackage = buffer->Length / (BUFFER_SIZE ) + 1;
-
+			pubFile->iTotalPackage = iTotalPackage;
 			//MessageBox::Show(Convert::ToString(sum));
 			CentralController::getObject()->publicFileForm->setUpProcessBar(1, iTotalPackage);
 			for (; curPackageNumber <= iTotalPackage; ++curPackageNumber)
@@ -661,15 +666,19 @@ public:
 				array<Byte>^ bData = gcnew array<Byte>(copyLength);
 				System::Array::Copy(buffer, counter, bData, 0, copyLength);
 				counter += copyLength;
-
-				pubFile->bData = bData;
 				check += bData->Length;
+				//MessageBox::Show(BitConverter::ToString(bData));
+				//if (pubFile->isEncrypted)
+					//pubFile->bData = Encoding::UTF8->GetBytes(Convert::ToBase64String(bData));
+				//else
+					pubFile->bData = bData;
+				
 				pubFile->iPackageNumber = curPackageNumber;
-				pubFile->iTotalPackage = iTotalPackage;
+				
 				array<Byte>^ byteData = pubFile->pack();
 				CentralController::getObject()->appSocket->sendMessage(byteData);
 				CentralController::getObject()->publicFileForm->setValueOfProcessBar(curPackageNumber);
-				Thread::Sleep(5);
+				Thread::Sleep(200);
 				delete[] pubFile->bData;
 				delete[] byteData;
 			}

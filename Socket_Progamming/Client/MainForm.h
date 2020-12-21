@@ -118,7 +118,7 @@ namespace Form_Client {
 			this->button_sendMsg->Location = System::Drawing::Point(373, 387);
 			this->button_sendMsg->Name = L"button_sendMsg";
 			this->button_sendMsg->Size = System::Drawing::Size(75, 53);
-			this->button_sendMsg->TabIndex = 3;
+			this->button_sendMsg->TabIndex = 1;
 			this->button_sendMsg->Text = L"Send";
 			this->button_sendMsg->UseVisualStyleBackColor = true;
 			this->button_sendMsg->Click += gcnew System::EventHandler(this, &MainForm::button_sendMsg_Click);
