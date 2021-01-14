@@ -11,8 +11,8 @@
 #include "PublicFileForm.h"
 
 
-#define DEFAULT_BUFFER_LENGTH 10752
-#define BUFFER_SIZE 10240
+#define DEFAULT_BUFFER_LENGTH 102912
+#define BUFFER_SIZE 102400
 
 ref class CentralController
 {
@@ -487,7 +487,7 @@ public:
 					setPrivateMessage(_ToUsername, "Sending...");
 				CentralController::getObject()->appSocket->sendMessage(byteData);
 				prvChatForm->setValueOfProcessBar(curPackageNumber);
-				Thread::Sleep(5);
+				Thread::Sleep(300);
 				delete[] prvFile->bData;
 			}
 			delete[] buffer;
@@ -678,7 +678,7 @@ public:
 				array<Byte>^ byteData = pubFile->pack();
 				CentralController::getObject()->appSocket->sendMessage(byteData);
 				CentralController::getObject()->publicFileForm->setValueOfProcessBar(curPackageNumber);
-				Thread::Sleep(200);
+				Thread::Sleep(300);
 				delete[] pubFile->bData;
 				delete[] byteData;
 			}
